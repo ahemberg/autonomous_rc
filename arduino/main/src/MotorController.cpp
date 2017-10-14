@@ -10,9 +10,9 @@
 #define SPEED 100
 
 void MotorController::stop() {
-  digitalWrite(AIN1, LOW);
-  digitalWrite(AIN2, LOW);
-  digitalWrite(PWMA, HIGH);
+    digitalWrite(AIN1, LOW);
+    digitalWrite(AIN2, LOW);
+    digitalWrite(PWMA, HIGH);
 }
 
 void MotorController::forward() {
@@ -30,9 +30,9 @@ void MotorController::backward() {
 }
 
 void MotorController::disable_engine() {
-  digitalWrite(STBY, LOW);
+    digitalWrite(STBY, LOW);
 }
 
 void MotorController::enable_engine() {
-  digitalWrite(STBY, HIGH);
+    digitalWrite(STBY, HIGH);
 }
