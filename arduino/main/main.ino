@@ -4,6 +4,7 @@
 #include "src/ultra_sound_reader.h"
 #include "src/StopState.h"
 #include "src/ForwardState.h"
+#include "src/BackwardState.h"
 #include "src/EngineState.h"
 #include "src/MotorController.h"
 
@@ -14,7 +15,16 @@ void setup() {
 
 UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 MotorController mc = MotorController();
-EngineState *state = new StopState(mc);
+
+StopState ss;
+ForwardState fs;
+BackwardState bs;
+
+ss = StopState(mc, &fs, &bs);
+fs = ForwardState(mc, &ss);
+bs = BackwardState(mc, &ss);
+
+EngineState *current_state = &ss;
 bool start = true;
 int distance;
 
@@ -26,9 +36,7 @@ void loop() {
  	us_reader.read_sensor();
  	distance = us_reader.get_distance();
  	Serial.println(distance);
- 	if(distance < 30) {
- 		Serial.println(-10000000);
+ 	if(distance < 50) {
  		state = state->stop();
- 		Serial.println(10000000);
  	}
 }

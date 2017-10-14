@@ -7,7 +7,7 @@ class EngineState {
     public:
         EngineState(MotorController);
         virtual EngineState *act(char command);
-        EngineState *stop();
+        EngineState stop();
     protected:
         MotorController motor_controller;
 };

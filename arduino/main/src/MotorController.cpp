@@ -7,7 +7,7 @@
 #define PWMA 3
 #define STBY 4
 
-#define SPEED 100
+#define SPEED 130
 
 void MotorController::stop() {
     digitalWrite(AIN1, LOW);

@@ -4,18 +4,20 @@
 #include "BackwardState.h"
 #include "MotorController.h"
 
-StopState::StopState(MotorController mc) : EngineState(mc) {}
-
+StopState::StopState(MotorController mc, ForwardState *fs, BackwardState *bs) : EngineState(mc) {
+    this->bs = bs;
+    this->fs = fs;
+}
 
 EngineState *StopState::act(char command) {
     switch(command) {
         case 'w':
             this->motor_controller.forward();
-            return new ForwardState(this->motor_controller);
+            return this->fs;//ForwardState(this->motor_controller);
         case 's':
             this->motor_controller.backward();
-            return new BackwardState(this->motor_controller);
+            return this->bs;//BackwardState(this->motor_controller);
         default:
-            return this;
+            return this//StopState(this->motor_controller);
     }
 };

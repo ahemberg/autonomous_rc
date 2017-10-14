@@ -4,7 +4,7 @@
 
 EngineState::EngineState(MotorController mc) : motor_controller(mc) {}
 
-EngineState *EngineState::stop() {
+EngineState EngineState::stop() {
 	this->motor_controller.stop();
-	return new StopState(this->motor_controller);
+	return StopState(this->motor_controller);
 }
