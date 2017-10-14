@@ -6,10 +6,8 @@ class MotorController {
         void stop();
         void forward();
         void backward();
-        void enable_engines();
-        void disable_engines();
-    private:
-        MotorController motor_controller;
+        void enable_engine();
+        void disable_engine();
 };
 
 #endif
