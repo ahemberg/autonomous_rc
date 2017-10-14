@@ -1,13 +1,15 @@
-#include "EngingeState.h"
+#include "EngineState.h"
 #include "BackwardState.h"
 #include "StopState.h"
+#include "MotorController.h"
 
+BackwardState::BackwardState(MotorController mc) : EngineState(mc) {}
 
-EngingeState BackwardState::act(char command) {
+EngineState *BackwardState::act(char command) {
     switch(command) {
         case 'w':
-            this.mc.stop();
-            return StopState(this.mc);
+            this->motor_controller.stop();
+            return new StopState(this->motor_controller);
         case 's':
             return this;
         default:

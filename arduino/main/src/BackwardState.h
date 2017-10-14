@@ -2,7 +2,12 @@
 #define BackwardState_h
 
 #include "EngineState.h"
+#include "MotorController.h"
 
-class BackwardState : public EngineState {};
+class BackwardState : public EngineState {
+public:
+	BackwardState(MotorController mc);
+	EngineState *act(char command);
+};
 
 #endif

@@ -2,7 +2,12 @@
 #define StopState_h
 
 #include "EngineState.h"
+#include "MotorController.h"
 
-class StopState : public EngineState {};
+class StopState : virtual public EngineState {
+public:
+	StopState(MotorController mc);
+	EngineState *act(char command);	
+};
 
 #endif

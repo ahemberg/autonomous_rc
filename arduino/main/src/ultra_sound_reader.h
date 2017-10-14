@@ -10,5 +10,5 @@ class UltraSoundReader {
     public:
         UltraSoundReader(int trigger_pin, int echo_pin);
         void read_sensor();
-        int get_distance();
+        long get_distance();
 };

@@ -16,14 +16,14 @@ void MotorController::stop() {
 }
 
 void MotorController::forward() {
-    this.enable_engines();
+    this->enable_engine();
     digitalWrite(AIN1, HIGH);
     digitalWrite(AIN2, LOW);
     analogWrite(PWMA, SPEED);
 }
 
 void MotorController::backward() {
-    this.enable_engines();
+    this->enable_engine();
     digitalWrite(AIN1, LOW);
     digitalWrite(AIN2, HIGH);
     analogWrite(PWMA, SPEED);
