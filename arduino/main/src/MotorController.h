@@ -9,6 +9,9 @@ class MotorController {
         void enable_engine();
         void disable_engine();
         void break_engine();
+        void servo_left();
+        void servo_right();
+        void servo_stop();
 };
 
 #endif

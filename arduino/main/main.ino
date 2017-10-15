@@ -1,7 +1,7 @@
-#define TRIG 6
-#define ECHO  9
+#define TRIG 11
+#define ECHO  12
 
-#include "src/ultra_sound_reader.h"
+#include "src/UltraSoundReader.h"
 #include "src/StopState.h"
 #include "src/ForwardState.h"
 #include "src/BackwardState.h"
