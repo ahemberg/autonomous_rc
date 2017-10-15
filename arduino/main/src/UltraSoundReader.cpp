@@ -14,9 +14,19 @@ void UltraSoundReader::read_sensor() {
 	digitalWrite(this->trigger, HIGH); 
     delayMicroseconds(5); 
     digitalWrite(this->trigger, LOW); 
-    this->distance = pulseIn(this->echo, HIGH, 200000);
+    this->distance = pulseIn(this->echo, HIGH, 50000);
+
+    if (this->distance <= 0) {
+    	lock = false;
+	} else {
+		lock = true;
+	}
 }
 
 long UltraSoundReader::get_distance() {
 	return (long)(this->distance) / 58.138;
+}
+
+bool UltraSoundReader::has_lock() {
+	return lock;
 }
