@@ -8,6 +8,7 @@ class MotorController {
         void backward();
         void enable_engine();
         void disable_engine();
+        void break_engine();
 };
 
 #endif

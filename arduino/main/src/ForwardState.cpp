@@ -1,11 +1,8 @@
 #include "EngineState.h"
 #include "ForwardState.h"
-#include "StopState.h"
 #include "MotorController.h"
 
-ForwardState::ForwardState(MotorController mc, StopState *ss) : EngineState(mc) {
-	this->ss = ss
-}
+ForwardState::ForwardState(MotorController mc) : EngineState(mc) {}
 
 EngineState *ForwardState::act(char command) {
 	switch(command) {
@@ -13,6 +10,10 @@ EngineState *ForwardState::act(char command) {
 		   this->motor_controller.stop();
 		   return this->ss;//StopState(this->motor_controller);
 		default:
-			return this//ForwardState(this->motor_controller);
-	}
+			return this;//ForwardState(this->motor_controller);
+	};
 };
+
+void ForwardState::setState(EngineState *ss) {
+	this->ss = ss;
+}

@@ -7,12 +7,18 @@
 #define PWMA 3
 #define STBY 4
 
-#define SPEED 130
+#define SPEED 255
 
 void MotorController::stop() {
     digitalWrite(AIN1, LOW);
     digitalWrite(AIN2, LOW);
     digitalWrite(PWMA, HIGH);
+}
+
+void MotorController::break_engine() {
+    digitalWrite(AIN1, HIGH);
+    digitalWrite(AIN2, LOW);
+    digitalWrite(PWMA, LOW);    
 }
 
 void MotorController::forward() {

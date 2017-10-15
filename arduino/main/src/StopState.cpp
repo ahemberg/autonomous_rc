@@ -1,13 +1,8 @@
 #include "EngineState.h"
 #include "StopState.h"
-#include "ForwardState.h"
-#include "BackwardState.h"
 #include "MotorController.h"
 
-StopState::StopState(MotorController mc, ForwardState *fs, BackwardState *bs) : EngineState(mc) {
-    this->bs = bs;
-    this->fs = fs;
-}
+StopState::StopState(MotorController mc) : EngineState(mc) {}
 
 EngineState *StopState::act(char command) {
     switch(command) {
@@ -18,6 +13,11 @@ EngineState *StopState::act(char command) {
             this->motor_controller.backward();
             return this->bs;//BackwardState(this->motor_controller);
         default:
-            return this//StopState(this->motor_controller);
+            return this;//StopState(this->motor_controller);
     }
+};
+
+void StopState::setState(EngineState *fs, EngineState *bs) {
+    this->fs = fs;
+    this->bs = bs;
 };

@@ -2,13 +2,14 @@
 #define BackwardState_h
 
 #include "EngineState.h"
-#include "StopState.h"
 #include "MotorController.h"
 
 class BackwardState : public EngineState {
 public:
-	BackwardState(MotorController mc, StopState *ss);
+	BackwardState(MotorController mc);
 	EngineState *act(char command);
+	void setState(EngineState *ss);
+	EngineState *ss;
 };
 
 #endif

@@ -2,13 +2,14 @@
 #define ForwardState_h
 
 #include "EngineState.h"
-#include "StopState.h"
 #include "MotorController.h"
 
 class ForwardState : public EngineState {
 public:
-	ForwardState(MotorController mc, StopState *stop_state);
+	ForwardState(MotorController mc);
 	EngineState *act(char command);
+	void setState(EngineState *ss);
+	EngineState *ss;
 };
 
 #endif
