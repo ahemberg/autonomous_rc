@@ -1,17 +1,19 @@
-#define TRIG 6
-#define ECHO  9
+#define TRIG 11
+#define ECHO  12
 
-#include "src/ultra_sound_reader.h"
+#include "src/UltraSoundReader.h"
 #include "src/StopState.h"
 #include "src/ForwardState.h"
 #include "src/BackwardState.h"
 #include "src/EngineState.h"
 #include "src/MotorController.h"
+#include "src/ServoController.h"
 
 MotorController mc = MotorController();
 StopState ss = StopState(mc);
 ForwardState fs = ForwardState(mc);
 BackwardState bs = BackwardState(mc);
+ServoController sc = ServoController(mc);
 
 void setup() {
   Serial.begin(9600); 
@@ -30,8 +32,19 @@ int distance;
 void loop() {
 	if(start) {
 		current_state = current_state->act('w');
+		// sc.turn_left();
 	} 
-  start = false;
+	// if(sc.get_state() == 'l') {
+	// 	if(sc.overshoot_left()) {
+	// 		sc.turn_right();
+	// 	}
+	// } else if(sc.get_state() == 'r') {
+	// 	if(sc.overshoot_right()) {
+	// 		sc.turn_left();
+	// 	}
+	// }
+
+  	start = false;
  	us_reader.read_sensor();
  	distance = us_reader.get_distance();
  	Serial.println(distance);
