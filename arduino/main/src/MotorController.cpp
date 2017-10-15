@@ -1,15 +1,15 @@
 #include "MotorController.h"
 #include "Arduino.h"
 
-#define AIN1 2
-#define AIN2 7
+#define AIN1 6
+#define AIN2 5
 #define PWMA 3
 
 #define STBY 4
 
 #define BIN1 8
-#define BIN2 12
-#define PWMB 5
+#define BIN2 10
+#define PWMB 9
 
 #define MOTOR_SPEED 120
 #define SERVO_SPEED 120

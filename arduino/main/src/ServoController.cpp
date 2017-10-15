@@ -11,17 +11,20 @@ ServoController::ServoController(MotorController mc) : motor_controller(mc) {}
 void ServoController::turn_left() {
 	if(!overshoot_left()) {
 		this->motor_controller.servo_left();
+		this->state = 'l';
 	}
 }
 
 void ServoController::turn_right() {
 	if(!overshoot_right()) {
 		this->motor_controller.servo_right();
+		this->state = 'r';
 	}
 }
 
 void ServoController::stop() {
 	this->motor_controller.servo_stop();
+	this->state = 's';
 }
 
 int ServoController::angle() {
@@ -38,4 +41,8 @@ bool ServoController::overshoot_right() {
 
 bool ServoController::overshoot() {
 	return this->overshoot_left() || this->overshoot_right();
+}
+
+char ServoController::get_state() {
+	return this->state;
 }
