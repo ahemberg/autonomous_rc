@@ -27,11 +27,14 @@ UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 
 EngineState *current_state = &ss;
 bool start = true;
-int distance;
 
-void loop() {
-	if(start) {
-		current_state = current_state->act('w');
+void loop() {  
+
+	if (start) {
+    	current_state = current_state->act('w');
+    	//digitalWrite(6, HIGH);
+		//digitalWrite(5, LOW);
+		//analogWrite(3, 120);
 		// sc.turn_left();
 	} 
 	// if(sc.get_state() == 'l') {
@@ -44,12 +47,18 @@ void loop() {
 	// 	}
 	// }
 
-  	start = false;
+	start = false;
  	us_reader.read_sensor();
- 	distance = us_reader.get_distance();
- 	Serial.println(distance);
-// 	if(distance < 50) {
-// 		current_state->stop();
-//    current_state = &ss;
-// 	}
+ 	if (us_reader.has_lock()) {
+ 		Serial.println(us_reader.get_distance());
+  	} else {
+  		Serial.print("NO Lock (");
+  		Serial.print(us_reader.get_distance());
+  		Serial.print(")\r\n");
+  	}
+
+  	if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
+ 		current_state->stop();
+    	current_state = &ss;
+ 	}
 }
