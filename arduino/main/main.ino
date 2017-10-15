@@ -48,8 +48,8 @@ void loop() {
  	us_reader.read_sensor();
  	distance = us_reader.get_distance();
  	Serial.println(distance);
- 	if(distance < 50) {
- 		current_state->stop();
-    current_state = &ss;
- 	}
+// 	if(distance < 50) {
+// 		current_state->stop();
+//    current_state = &ss;
+// 	}
 }
