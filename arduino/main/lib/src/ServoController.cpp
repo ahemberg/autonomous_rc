@@ -38,7 +38,7 @@ void ServoController::set_goal(char direction) {
 void ServoController::reach_goal() {
 	int diff = this->goal_diff();
 
-	if(diff < TOLERANCE) {
+	if(diff < -TOLERANCE) {
 		this->turn_right();
 	}
 	else if(diff > TOLERANCE) {
