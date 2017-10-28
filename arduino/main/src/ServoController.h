@@ -8,6 +8,9 @@ class ServoController {
         ServoController(MotorController);
         void turn_left();
         void turn_right();
+        void reach_goal();
+        void set_goal(char direction);
+        int goal_diff();
         void stop();
         void break_engine();
         int angle();
