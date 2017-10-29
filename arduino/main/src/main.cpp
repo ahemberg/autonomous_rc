@@ -28,28 +28,47 @@ void setup() {
 UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 
 EngineState *current_state = &ss;
-bool start = true;
-
+char comm;
 void loop() {
 
-	if (start) {
-    	current_state = current_state->act('w');
-      sc.set_goal('l');
-	}
+    if (Serial.available() > 0) {
+        comm = Serial.read();
+    }
 
-	start = false;
-  sc.reach_goal();
+    if (comm == 'z' || comm == 'x' || comm == 'c') {
+        sc.set_goal(comm);
+        comm = 0;
+    } else if (comm == 'w' || comm == 's') {
+        current_state = current_state->act(comm);
+        comm = 0;
+    }
+
+    //if (start) {
+        //current_state = current_state->act('w');
+        //sc.set_goal('l');
+	//}
+
+    sc.reach_goal();
  	us_reader.read_sensor();
  	if (us_reader.has_lock()) {
- 		Serial.println(us_reader.get_distance());
+    Serial.print("DISTANCE: ");
+    Serial.print(us_reader.get_distance());
   	} else {
   		Serial.print("NO Lock (");
   		Serial.print(us_reader.get_distance());
-  		Serial.print(")\r\n");
   	}
+
+    Serial.print(", DIFF ");
+    Serial.print(sc.goal_diff());
+    Serial.print(", ANGLE ");
+    Serial.print(sc.angle());
+    Serial.print("\r\n");
 
   	if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
  		current_state->stop();
     	current_state = &ss;
  	}
+
+
+
 }

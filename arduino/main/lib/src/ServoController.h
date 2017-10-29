@@ -22,7 +22,8 @@ class ServoController {
         MotorController motor_controller;
     private:
         char state;
-        char goal;
+        int goal = 660;
+        int current_tol = 5;
 };
 
 #endif

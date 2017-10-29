@@ -11,8 +11,8 @@
 #define BIN2 10
 #define PWMB 9
 
-#define MOTOR_SPEED 120
-#define SERVO_SPEED 120
+#define MOTOR_SPEED 150
+#define SERVO_SPEED 90
 
 void MotorController::stop() {
     digitalWrite(AIN1, LOW);
@@ -23,7 +23,7 @@ void MotorController::stop() {
 void MotorController::break_engine() {
     digitalWrite(AIN1, HIGH);
     digitalWrite(AIN2, LOW);
-    digitalWrite(PWMA, LOW);    
+    digitalWrite(PWMA, LOW);
 }
 
 void MotorController::forward() {

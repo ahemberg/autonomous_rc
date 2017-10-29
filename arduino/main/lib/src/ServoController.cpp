@@ -5,7 +5,8 @@
 #define SERVO_MEAS A0
 #define MAX_LEFT 700
 #define MAX_RIGHT 620
-#define TOLERANCE 10
+#define START_TOLERANCE 20
+#define REACH_TOLERANCE 5
 
 ServoController::ServoController(MotorController mc) : motor_controller(mc) {}
 
@@ -24,27 +25,33 @@ void ServoController::turn_right() {
 }
 
 void ServoController::set_goal(char direction) {
-	if(direction == 'r') {
+
+	this->current_tol = REACH_TOLERANCE;
+
+	if(direction == 'c') {
 		this->goal = MAX_RIGHT;
 	}
-	else if(direction == 'l') {
+	else if(direction == 'z') {
 		this->goal = MAX_LEFT;
 	}
-	else if(direction == 's') {
-		this->goal = (MAX_LEFT - MAX_RIGHT) / 2;
+	else if(direction == 'x') {
+		this->goal = MAX_LEFT - (MAX_LEFT - MAX_RIGHT) / 2;
 	}
 }
 
 void ServoController::reach_goal() {
 	int diff = this->goal_diff();
 
-	if(diff < -TOLERANCE) {
+	if(diff < -this->current_tol) {
 		this->turn_right();
+		this->current_tol = REACH_TOLERANCE;
 	}
-	else if(diff > TOLERANCE) {
+	else if(diff > this->current_tol) {
 		this->turn_left();
+		this->current_tol = REACH_TOLERANCE;
 	}
 	else {
+		this->current_tol = START_TOLERANCE;
 		this->stop();
 	}
 }
