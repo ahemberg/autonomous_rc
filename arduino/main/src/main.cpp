@@ -12,63 +12,68 @@
 #include <ServoController.h>
 
 MotorController mc = MotorController();
+
 StopState ss = StopState(mc);
 ForwardState fs = ForwardState(mc);
 BackwardState bs = BackwardState(mc);
 ServoController sc = ServoController(mc);
-
-void setup() {
-  Serial.begin(9600);
-  Serial.setTimeout(50);
-  ss.setState(&fs, &bs);
-  fs.setState(&ss);
-  bs.setState(&ss);
-}
+EngineState *current_state = &ss;
 
 UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 
-EngineState *current_state = &ss;
-char comm;
+char motor_command;
+char servo_command;
+String inputString = "";         // a String to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+
+void setup() {
+    Serial.begin(9600);
+    Serial.setTimeout(50);
+    ss.setState(&fs, &bs);
+    fs.setState(&ss);
+    bs.setState(&ss);
+}
+
 void loop() {
-
-    if (Serial.available() > 0) {
-        comm = Serial.read();
+    if (stringComplete) {
+        motor_command = inputString[0];
+        servo_command = inputString[1];
+        inputString = "";
+        stringComplete = false;
     }
 
-    if (comm == 'z' || comm == 'x' || comm == 'c') {
-        sc.set_goal(comm);
-        comm = 0;
-    } else if (comm == 'w' || comm == 's') {
-        current_state = current_state->act(comm);
-        comm = 0;
+    if (servo_command != ' ') {
+        sc.set_goal(servo_command);
+        servo_command = ' ';
     }
 
-    //if (start) {
-        //current_state = current_state->act('w');
-        //sc.set_goal('l');
-	//}
-
+    if (motor_command != ' ') {
+        current_state = current_state->act(motor_command);
+        motor_command = ' ';
+    }
     sc.reach_goal();
- 	us_reader.read_sensor();
- 	if (us_reader.has_lock()) {
-    Serial.print("DISTANCE: ");
+    us_reader.read_sensor();
+
+    if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
+        current_state->stop();
+        current_state = &ss;
+    }
+
+    Serial.print("distance:");
     Serial.print(us_reader.get_distance());
-  	} else {
-  		Serial.print("NO Lock (");
-  		Serial.print(us_reader.get_distance());
-  	}
-
-    Serial.print(", DIFF ");
-    Serial.print(sc.goal_diff());
-    Serial.print(", ANGLE ");
-    Serial.print(sc.angle());
+    Serial.print(";servo_state:");
+    Serial.print(sc.get_state());
+    Serial.print(";motor_state:");
+    Serial.print(mc.get_state());
     Serial.print("\r\n");
+}
 
-  	if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
- 		current_state->stop();
-    	current_state = &ss;
- 	}
-
-
-
+void serialEvent() {
+    while (Serial.available()) {
+        char inChar = (char)Serial.read();
+        inputString += inChar;
+        if (inChar == '\n') {
+            stringComplete = true;
+        }
+    }
 }

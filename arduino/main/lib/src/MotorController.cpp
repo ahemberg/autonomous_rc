@@ -1,5 +1,5 @@
 #include "MotorController.h"
-#include "Arduino.h"
+#include <Arduino.h>
 
 #define AIN1 6
 #define AIN2 5
@@ -66,4 +66,8 @@ void MotorController::servo_stop() {
     digitalWrite(BIN1, LOW);
     digitalWrite(BIN2, LOW);
     digitalWrite(PWMB, HIGH);
+}
+
+String MotorController::get_state() {
+    return "";
 }

@@ -1,14 +1,14 @@
 #include "ServoController.h"
 #include "MotorController.h"
-#include "Arduino.h"
+#include <Arduino.h>
 
 #define SERVO_MEAS A0
 #define MAX_LEFT 700
 #define MAX_RIGHT 620
-#define START_TOLERANCE 20
-#define REACH_TOLERANCE 5
+#define TOLERANCE 10
 
-ServoController::ServoController(MotorController mc) : motor_controller(mc) {}
+ServoController::ServoController(MotorController mc) :
+	motor_controller(mc) {}
 
 void ServoController::turn_left() {
 	if(!overshoot_left()) {
@@ -25,33 +25,27 @@ void ServoController::turn_right() {
 }
 
 void ServoController::set_goal(char direction) {
-
-	this->current_tol = REACH_TOLERANCE;
-
-	if(direction == 'c') {
+	if(direction == 'r') {
 		this->goal = MAX_RIGHT;
 	}
-	else if(direction == 'z') {
+	else if(direction == 'l') {
 		this->goal = MAX_LEFT;
 	}
-	else if(direction == 'x') {
-		this->goal = MAX_LEFT - (MAX_LEFT - MAX_RIGHT) / 2;
+	else if(direction == 's') {
+		this->goal = (MAX_LEFT - MAX_RIGHT) / 2;
 	}
 }
 
 void ServoController::reach_goal() {
 	int diff = this->goal_diff();
 
-	if(diff < -this->current_tol) {
+	if(diff < -TOLERANCE) {
 		this->turn_right();
-		this->current_tol = REACH_TOLERANCE;
 	}
-	else if(diff > this->current_tol) {
+	else if(diff > TOLERANCE) {
 		this->turn_left();
-		this->current_tol = REACH_TOLERANCE;
 	}
 	else {
-		this->current_tol = START_TOLERANCE;
 		this->stop();
 	}
 }
@@ -81,6 +75,11 @@ bool ServoController::overshoot() {
 	return this->overshoot_left() || this->overshoot_right();
 }
 
-char ServoController::get_state() {
-	return this->state;
+String ServoController::get_state() {
+	String state = "goal: ";
+	state += String(this->goal);
+	state += ", angle: ";
+	state += String(this->angle());
+	state += this->state;
+	return state;
 }

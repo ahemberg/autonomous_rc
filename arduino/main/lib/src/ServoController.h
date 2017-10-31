@@ -17,7 +17,7 @@ class ServoController {
         bool overshoot_left();
         bool overshoot_right();
         bool overshoot();
-        char get_state();
+        String get_state();
     protected:
         MotorController motor_controller;
     private:
