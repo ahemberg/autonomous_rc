@@ -73,7 +73,8 @@ void serialEvent() {
         char inChar = (char)Serial.read();
         inputString += inChar;
         if (inChar == '\n') {
-            stringComplete = true;
+
         }
+        stringComplete = true;
     }
 }
