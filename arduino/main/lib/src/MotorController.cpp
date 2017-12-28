@@ -1,71 +1,80 @@
 #include "MotorController.h"
 #include <Arduino.h>
 
-#define AIN1 6
-#define AIN2 5
-#define PWMA 3
+// #define AIN1 6  // 10/5
+// #define AIN2 5  // 12/7
+#define INPUT1_MOTOR 5
+#define INPUT2_MOTOR 6
+// #define PWMA 3
+#define ENABLE_MOTOR 4
 
-#define STBY 4
-
-#define BIN1 8
-#define BIN2 10
-#define PWMB 9
+// #define STBY 4 // Enable 11/6
+#define ENABLE_SERVO 8
+#define PWM_SERVO 9
+#define SERVO_AIN1 10
+#define SERVO_AIN2 3
+//#define INPUT1_SERVO 10
+//#define INPUT2_SERVO 12
 
 #define MOTOR_SPEED 150
 #define SERVO_SPEED 90
 
 void MotorController::stop() {
-    digitalWrite(AIN1, LOW);
-    digitalWrite(AIN2, LOW);
-    digitalWrite(PWMA, HIGH);
+    this->disable_engine();
 }
 
 void MotorController::break_engine() {
-    digitalWrite(AIN1, HIGH);
-    digitalWrite(AIN2, LOW);
-    digitalWrite(PWMA, LOW);
+    this->enable_engine();
+    digitalWrite(INPUT1_MOTOR, LOW);
+    digitalWrite(INPUT2_MOTOR, LOW);
 }
 
 void MotorController::forward() {
     this->enable_engine();
-    digitalWrite(AIN1, HIGH);
-    digitalWrite(AIN2, LOW);
-    analogWrite(PWMA, MOTOR_SPEED);
+    analogWrite(INPUT1_MOTOR, MOTOR_SPEED);
+    analogWrite(INPUT2_MOTOR, LOW);
 }
 
 void MotorController::backward() {
     this->enable_engine();
-    digitalWrite(AIN1, LOW);
-    digitalWrite(AIN2, HIGH);
-    analogWrite(PWMA, MOTOR_SPEED);
+    analogWrite(INPUT1_MOTOR, LOW);
+    analogWrite(INPUT2_MOTOR, MOTOR_SPEED);
 }
 
 void MotorController::disable_engine() {
-    digitalWrite(STBY, LOW);
+    digitalWrite(ENABLE_MOTOR, LOW);
 }
 
 void MotorController::enable_engine() {
-    digitalWrite(STBY, HIGH);
+    digitalWrite(ENABLE_MOTOR, HIGH);
+}
+
+void MotorController::enable_servo() {
+    digitalWrite(ENABLE_SERVO, HIGH);
+}
+
+void MotorController::disable_servo() {
+    digitalWrite(ENABLE_SERVO, LOW);
 }
 
 void MotorController::servo_left() {
-    this->enable_engine();
-    digitalWrite(BIN1, HIGH);
-    digitalWrite(BIN2, LOW);
-    analogWrite(PWMB, SERVO_SPEED);
+    this->enable_servo();
+    digitalWrite(SERVO_AIN1, HIGH);
+    digitalWrite(SERVO_AIN2, LOW);
+    analogWrite(PWM_SERVO, SERVO_SPEED);
 }
 
 void MotorController::servo_right() {
-    this->enable_engine();
-    digitalWrite(BIN1, LOW);
-    digitalWrite(BIN2, HIGH);
-    analogWrite(PWMB, SERVO_SPEED);
+    this->enable_servo();
+    digitalWrite(SERVO_AIN1, LOW);
+    digitalWrite(SERVO_AIN2, HIGH);
+    analogWrite(PWM_SERVO, SERVO_SPEED);
 }
 
 void MotorController::servo_stop() {
-    digitalWrite(BIN1, LOW);
-    digitalWrite(BIN2, LOW);
-    digitalWrite(PWMB, HIGH);
+    digitalWrite(SERVO_AIN1, LOW);
+    digitalWrite(SERVO_AIN2, LOW);
+    digitalWrite(PWM_SERVO, HIGH);
 }
 
 String MotorController::get_state() {

@@ -10,6 +10,8 @@ class MotorController {
         void backward();
         void enable_engine();
         void disable_engine();
+        void enable_servo();
+        void disable_servo();
         void break_engine();
         void servo_left();
         void servo_right();

@@ -23,6 +23,7 @@ UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 
 char motor_command;
 char servo_command;
+char command;
 String inputString = "";         // a String to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
@@ -35,12 +36,19 @@ void setup() {
 }
 
 void loop() {
-    if (stringComplete) {
-        motor_command = inputString[0];
-        servo_command = inputString[1];
-        inputString = "";
-        stringComplete = false;
+    // if (stringComplete) {
+        // motor_command = inputString[0];
+        // servo_command = inputString[1];
+    if ((command == 'a') || (command == 'd') || (command == 'x')) {
+        servo_command = command;
+        motor_command = ' ';
     }
+    else if ((command == 'w') || (command == 's')) {
+        motor_command = command;
+        servo_command = ' ';
+    }
+    // inputString = "";
+    // stringComplete = false;
 
     if (servo_command != ' ') {
         sc.set_goal(servo_command);
@@ -59,21 +67,25 @@ void loop() {
         current_state = &ss;
     }
 
-    Serial.print("distance:");
-    Serial.print(us_reader.get_distance());
-    Serial.print(";servo_state:");
-    Serial.print(sc.get_state());
-    Serial.print(";motor_state:");
-    Serial.print(mc.get_state());
-    Serial.print("\r\n");
+    // Serial.print("distance:");
+    // Serial.print(us_reader.get_distance());
+    // Serial.print(";servo_state:");
+    // Serial.print(sc.get_state());
+    // Serial.print(";motor_state:");
+    // Serial.print(mc.get_state());
+    // Serial.print(command);
+    // Serial.print("\r\n");
+
+    // Clear command to not stay in state
+    command = ' ';
 }
 
 void serialEvent() {
     while (Serial.available()) {
-        char inChar = (char)Serial.read();
-        inputString += inChar;
-        if (inChar == '\n') {
-            stringComplete = true;
-        }
+        command = (char)Serial.read();
+        // inputString += inChar;
+        // if (inChar == '\r') {
+        // }
+        // stringComplete = true;
     }
 }
