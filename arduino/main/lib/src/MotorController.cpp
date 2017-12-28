@@ -12,11 +12,11 @@
 #define ENABLE_SERVO 8
 #define PWM_SERVO 9
 #define SERVO_AIN1 10
-#define SERVO_AIN2 13
+#define SERVO_AIN2 3
 //#define INPUT1_SERVO 10
 //#define INPUT2_SERVO 12
 
-#define MOTOR_SPEED 255
+#define MOTOR_SPEED 150
 #define SERVO_SPEED 90
 
 void MotorController::stop() {

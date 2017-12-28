@@ -3,8 +3,8 @@
 #include <Arduino.h>
 
 #define SERVO_MEAS A0
-#define MAX_LEFT 700
-#define MAX_RIGHT 620
+#define MAX_LEFT 780
+#define MAX_RIGHT 580
 #define TOLERANCE 10
 
 ServoController::ServoController(MotorController mc) :
@@ -13,26 +13,26 @@ ServoController::ServoController(MotorController mc) :
 void ServoController::turn_left() {
 	if(!overshoot_left()) {
 		this->motor_controller.servo_left();
-		this->state = 'l';
+		this->state = 'a';
 	}
 }
 
 void ServoController::turn_right() {
 	if(!overshoot_right()) {
 		this->motor_controller.servo_right();
-		this->state = 'r';
+		this->state = 'd';
 	}
 }
 
 void ServoController::set_goal(char direction) {
-	if(direction == 'r') {
+	if(direction == 'd') {
 		this->goal = MAX_RIGHT;
 	}
-	else if(direction == 'l') {
+	else if(direction == 'a') {
 		this->goal = MAX_LEFT;
 	}
-	else if(direction == 's') {
-		this->goal = (MAX_LEFT - MAX_RIGHT) / 2;
+	else if(direction == 'x') {
+		this->goal = MAX_RIGHT + (MAX_LEFT - MAX_RIGHT) / 2;
 	}
 }
 
@@ -56,7 +56,7 @@ int ServoController::goal_diff() {
 
 void ServoController::stop() {
 	this->motor_controller.servo_stop();
-	this->state = 's';
+	this->state = 'x';
 }
 
 int ServoController::angle() {
