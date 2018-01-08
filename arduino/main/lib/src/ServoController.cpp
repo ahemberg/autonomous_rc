@@ -25,7 +25,8 @@ void ServoController::turn_right() {
 }
 
 void ServoController::set_goal(int direction) {
-	this->goal = (MAX_RIGHT-MAX_LEFT) * (direction - 100) / 200  + MAX_RIGHT; // direction = [-100, 100]
+	this->goal = (MAX_RIGHT-MAX_LEFT) * (float)(direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
+	Serial.println(this->goal);
 }
 
 void ServoController::reach_goal() {

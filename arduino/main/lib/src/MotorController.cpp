@@ -32,6 +32,8 @@ void MotorController::break_engine() {
 void MotorController::forward(int speed) {
     speed = (speed < 0) ? -1*speed : speed; // get absolute value
     this->enable_engine();
+    Serial.println("MSMSMSMS");
+    Serial.println(MOTOR_SPEED_MAX * speed / 100);    
     analogWrite(INPUT1_MOTOR, MOTOR_SPEED_MAX * speed / 100);
     analogWrite(INPUT2_MOTOR, LOW);
 }
