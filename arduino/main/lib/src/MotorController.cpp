@@ -16,7 +16,7 @@
 //#define INPUT1_SERVO 10
 //#define INPUT2_SERVO 12
 
-#define MOTOR_SPEED 150
+#define MOTOR_SPEED_MAX 150
 #define SERVO_SPEED 90
 
 void MotorController::stop() {
@@ -29,16 +29,18 @@ void MotorController::break_engine() {
     digitalWrite(INPUT2_MOTOR, LOW);
 }
 
-void MotorController::forward() {
+void MotorController::forward(int speed) {
+    speed = (speed < 0) ? -1*speed : speed; // get absolute value
     this->enable_engine();
-    analogWrite(INPUT1_MOTOR, MOTOR_SPEED);
+    analogWrite(INPUT1_MOTOR, MOTOR_SPEED_MAX * speed / 100);
     analogWrite(INPUT2_MOTOR, LOW);
 }
 
-void MotorController::backward() {
+void MotorController::backward(int speed) {
+    speed = (speed < 0) ? -1*speed : speed; // get absolute value
     this->enable_engine();
     analogWrite(INPUT1_MOTOR, LOW);
-    analogWrite(INPUT2_MOTOR, MOTOR_SPEED);
+    analogWrite(INPUT2_MOTOR, MOTOR_SPEED_MAX * speed / 100);
 }
 
 void MotorController::disable_engine() {

@@ -7,10 +7,10 @@
 class StopState : public EngineState {
 public:
 	StopState(MotorController mc);
-	EngineState *act(char command);
+	EngineState *act(int setSpeed);
 	void setState(EngineState *fs, EngineState *bs);
 	EngineState *fs;
-	EngineState *bs;	
+	EngineState *bs;
 };
 
 #endif

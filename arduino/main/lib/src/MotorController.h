@@ -6,8 +6,8 @@
 class MotorController {
     public:
         void stop();
-        void forward();
-        void backward();
+        void forward(int speed);
+        void backward(int speed);
         void enable_engine();
         void disable_engine();
         void enable_servo();

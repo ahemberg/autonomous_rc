@@ -24,16 +24,8 @@ void ServoController::turn_right() {
 	}
 }
 
-void ServoController::set_goal(char direction) {
-	if(direction == 'd') {
-		this->goal = MAX_RIGHT;
-	}
-	else if(direction == 'a') {
-		this->goal = MAX_LEFT;
-	}
-	else if(direction == 'x') {
-		this->goal = MAX_RIGHT + (MAX_LEFT - MAX_RIGHT) / 2;
-	}
+void ServoController::set_goal(int direction) {
+	this->goal = (MAX_RIGHT-MAX_LEFT) * (direction - 100) / 200  + MAX_RIGHT; // direction = [-100, 100]
 }
 
 void ServoController::reach_goal() {

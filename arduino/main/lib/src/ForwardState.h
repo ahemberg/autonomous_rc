@@ -7,7 +7,7 @@
 class ForwardState : public EngineState {
 public:
 	ForwardState(MotorController mc);
-	EngineState *act(char command);
+	EngineState *act(int setSpeed);
 	void setState(EngineState *ss);
 	EngineState *ss;
 };

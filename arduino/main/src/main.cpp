@@ -21,11 +21,23 @@ EngineState *current_state = &ss;
 
 UltraSoundReader us_reader = UltraSoundReader(TRIG,ECHO);
 
-char motor_command;
-char servo_command;
-char command;
-String inputString = "";         // a String to hold incoming data
-boolean stringComplete = false;  // whether the string is complete
+short int currentSpeed = 0;
+short int currentAngle = 0;
+
+void setDirection(int speed, int angle){
+    // speed = motor speed in % of max, [-100, 100]. 0=stop
+    // angle = turn angle in % of max, [-100, 100]
+    if ((speed != currentSpeed) && (speed < 101)) {
+        current_state = current_state->act(speed);
+        currentSpeed = speed;
+    }
+    if ((angle != currentAngle) && (angle < 101)) {
+        sc.set_goal(angle);
+        sc.reach_goal();
+        currentAngle = angle;
+    }
+}
+
 
 void setup() {
     Serial.begin(9600);
@@ -36,56 +48,37 @@ void setup() {
 }
 
 void loop() {
-    // if (stringComplete) {
-        // motor_command = inputString[0];
-        // servo_command = inputString[1];
-    if ((command == 'a') || (command == 'd') || (command == 'x')) {
-        servo_command = command;
-        motor_command = ' ';
-    }
-    else if ((command == 'w') || (command == 's')) {
-        motor_command = command;
-        servo_command = ' ';
-    }
-    // inputString = "";
-    // stringComplete = false;
-
-    if (servo_command != ' ') {
-        sc.set_goal(servo_command);
-        servo_command = ' ';
-    }
-
-    if (motor_command != ' ') {
-        current_state = current_state->act(motor_command);
-        motor_command = ' ';
-    }
-    sc.reach_goal();
     us_reader.read_sensor();
 
     if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
         current_state->stop();
         current_state = &ss;
     }
-
-    // Serial.print("distance:");
-    // Serial.print(us_reader.get_distance());
-    // Serial.print(";servo_state:");
-    // Serial.print(sc.get_state());
-    // Serial.print(";motor_state:");
-    // Serial.print(mc.get_state());
-    // Serial.print(command);
-    // Serial.print("\r\n");
-
-    // Clear command to not stay in state
-    command = ' ';
 }
 
 void serialEvent() {
+    char command;
+    short int speed=999, angle=999; // function setDirection() ignores values>100
+
     while (Serial.available()) {
         command = (char)Serial.read();
-        // inputString += inChar;
-        // if (inChar == '\r') {
-        // }
-        // stringComplete = true;
+
+        switch (command) {
+            case 'a':
+              angle = -100;
+            case 'd':
+              angle = 100;
+            case 'x':
+              angle = 0;
+            case 'w':
+              speed = 100;
+            case 's':
+              speed = -100;
+            case 'q':
+              speed = 0;
+        }
+
+        setDirection(speed, angle);
     }
+
 }
