@@ -1,5 +1,6 @@
-import serial
 from time import sleep
+
+import serial
 
 
 class Brain:
@@ -28,10 +29,17 @@ class Brain:
     def straight(self):
         self.send_command(b'x')
 
+    def take_picture(self):
+        self.send_command(b'p')
+
+    def read_status(self):
+        return self.ser.readline()
+
 
 def main():
     brain = Brain()
     brain.forward()
+    print(brain.read_status())
     sleep(1)
     brain.stop()
     sleep(1)
