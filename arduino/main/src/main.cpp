@@ -19,7 +19,7 @@
 #define INPUT2_MOTOR 6
 #define ENABLE_MOTOR 4
 
-short int speed = 0, angle = 0, old_angle = 0;
+short int speed = 0, angle = 0, old_angle = 100;
 bool stopped = false;
 
 MotorController mc = MotorController(INPUT1_MOTOR, INPUT2_MOTOR, ENABLE_MOTOR);
