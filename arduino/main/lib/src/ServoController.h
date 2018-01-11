@@ -1,29 +1,32 @@
 #ifndef ServoController_h
 #define ServoController_h
 
-#include "MotorController.h"
-
 class ServoController {
     public:
-        ServoController(MotorController);
+        ServoController(
+            int pwm_pin, int enable_pin, int in1_pin, int in2_pin, char duty,
+            int analog_pin
+        );
+        void enable_servo();
+        void disable_servo();
+        void servo_left();
+        void servo_right();
+        void servo_stop();
         void turn_left();
         void turn_right();
-        void reach_goal();
         void set_goal(int direction);
-        int goal_diff();
+        void reach_goal();
         void stop();
-        void break_engine();
         int angle();
+        int goal_diff();
         bool overshoot_left();
         bool overshoot_right();
         bool overshoot();
-        String get_state();
-    protected:
-        MotorController motor_controller;
+        int goal;
     private:
-        char state;
-        int goal = 660;
-        int current_tol = 5;
+        int pwm_pin, enable_pin, in1_pin, in2_pin, analog_pin;
+        char duty;
+    protected:
 };
 
 #endif

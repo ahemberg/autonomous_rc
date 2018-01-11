@@ -1,32 +1,74 @@
-#include "ServoController.h"
-#include "MotorController.h"
-#include <Arduino.h>
 
-#define SERVO_MEAS A0
-#define MAX_LEFT 780
+#include "ServoController.h"
+#include "Arduino.h"
+
+// #define STBY 4 // Enable 11/6
+#define MAX_LEFT 780 //THESE VALUES SHOULD BE CALIBRATABLE
 #define MAX_RIGHT 580
 #define TOLERANCE 10
 
-ServoController::ServoController(MotorController mc) :
-	motor_controller(mc) {}
+ServoController::ServoController(
+    int pwm_pin, int enable_pin, int in1_pin, int in2_pin, char duty,
+    int analog_pin
+) {
+    this->pwm_pin = pwm_pin;
+    this->enable_pin = enable_pin;
+    this->in1_pin = in1_pin;
+    this->in2_pin = in2_pin;
+    this->duty = duty; // TODO: Change this ??
+    this->analog_pin = analog_pin;
+}
+
+// LOW LEVEL NITTY/GRITTY STUFFS
+
+void ServoController::enable_servo() {
+    digitalWrite(this->enable_pin, HIGH);
+}
+
+void ServoController::disable_servo() {
+    digitalWrite(this->enable_pin, LOW);
+}
+
+void ServoController::servo_left() {
+    this->enable_servo();
+    digitalWrite(this->in1_pin, HIGH);
+    digitalWrite(this->in2_pin, LOW);
+    analogWrite(this->pwm_pin, this->duty);
+}
+
+void ServoController::servo_right() {
+    this->enable_servo();
+    digitalWrite(this->in1_pin, LOW);
+    digitalWrite(this->in2_pin, HIGH);
+    analogWrite(this->pwm_pin, this->duty);
+}
+
+void ServoController::servo_stop() {
+    digitalWrite(this->in1_pin, LOW);
+    digitalWrite(this->in2_pin, LOW);
+}
+
+int ServoController::angle() {
+	return analogRead(this->analog_pin);
+}
+
+// PROPER CONTROL STUFFS
 
 void ServoController::turn_left() {
 	if(!overshoot_left()) {
-		this->motor_controller.servo_left();
-		this->state = 'a';
+		this->servo_left();
 	}
 }
 
 void ServoController::turn_right() {
 	if(!overshoot_right()) {
-		this->motor_controller.servo_right();
-		this->state = 'd';
-	}
+		this->servo_right();
+    }
 }
 
+// TODO: Rewrite this function!
 void ServoController::set_goal(int direction) {
 	this->goal = (MAX_RIGHT-MAX_LEFT) * (float)(direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
-	Serial.println(this->goal);
 }
 
 void ServoController::reach_goal() {
@@ -48,12 +90,7 @@ int ServoController::goal_diff() {
 }
 
 void ServoController::stop() {
-	this->motor_controller.servo_stop();
-	this->state = 'x';
-}
-
-int ServoController::angle() {
-	return analogRead(SERVO_MEAS);
+	this->servo_stop();
 }
 
 bool ServoController::overshoot_left() {
@@ -66,13 +103,4 @@ bool ServoController::overshoot_right() {
 
 bool ServoController::overshoot() {
 	return this->overshoot_left() || this->overshoot_right();
-}
-
-String ServoController::get_state() {
-	String state = "goal: ";
-	state += String(this->goal);
-	state += ", angle: ";
-	state += String(this->angle());
-	state += this->state;
-	return state;
 }

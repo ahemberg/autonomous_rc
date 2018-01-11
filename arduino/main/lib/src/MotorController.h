@@ -1,22 +1,20 @@
 #ifndef MotorController_h
 #define MotorController_h
 
-#include <Arduino.h>
-
 class MotorController {
     public:
+        MotorController(
+            int input_pin_1, int input_pin_2, int enable_pin
+        );
         void stop();
-        void forward(int speed);
-        void backward(int speed);
+        void forward(char duty);
+        void backward(char duty);
         void enable_engine();
         void disable_engine();
-        void enable_servo();
-        void disable_servo();
         void break_engine();
-        void servo_left();
-        void servo_right();
-        void servo_stop();
-        String get_state();
+    private:
+        int input_pin_1, input_pin_2, enable_pin;
+    protected:
 };
 
 #endif

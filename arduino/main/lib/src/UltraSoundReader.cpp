@@ -4,7 +4,7 @@
 
 
 UltraSoundReader::UltraSoundReader(int trigger_pin, int echo_pin) {
-	pinMode(echo_pin, INPUT); 
+	pinMode(echo_pin, INPUT);
     pinMode(trigger_pin, OUTPUT);
 	this->trigger = trigger_pin;
 	this->echo = echo_pin;
@@ -12,8 +12,8 @@ UltraSoundReader::UltraSoundReader(int trigger_pin, int echo_pin) {
 
 void UltraSoundReader::read_sensor() {
 	digitalWrite(this->trigger, HIGH); 
-    delayMicroseconds(5); 
-    digitalWrite(this->trigger, LOW); 
+    delayMicroseconds(5);
+    digitalWrite(this->trigger, LOW);
     this->distance = pulseIn(this->echo, HIGH, 50000);
 
     if (this->distance <= 0) {
