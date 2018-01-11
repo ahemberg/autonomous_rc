@@ -66,16 +66,22 @@ void serialEvent() {
         switch (command) {
             case 'a':
               angle = -100;
+              break;
             case 'd':
               angle = 100;
+              break;
             case 'x':
               angle = 0;
+              break;
             case 'w':
               speed = 100;
+              break;
             case 's':
               speed = -100;
+              break;
             case 'q':
               speed = 0;
+              break;
         }
 
         setDirection(speed, angle);
