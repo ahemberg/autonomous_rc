@@ -26,18 +26,18 @@ void loop() {
         speed = 0;
     }
 
-    if (speed ==  -100) {
-        mc.backward(200);
-        stopped = false;
-    } else if (speed == 100) {
-        mc.forward(200);
-        stopped = false;
-    } else if (!stopped) {
-        mc.break_engine();
-        delay(100);
-        mc.disable_engine();
-        stopped = true;
-    }
+    // if (speed ==  -100) {
+    //     mc.backward(200);
+    //     stopped = false;
+    // } else if (speed == 100) {
+    //     mc.forward(200);
+    //     stopped = false;
+    // } else if (!stopped) {
+    //     mc.break_engine();
+    //     delay(100);
+    //     mc.disable_engine();
+    //     stopped = true;
+    // }
 
     if (angle >= -100 && angle <= 100 && angle != old_angle) {
         sc.set_goal(angle);

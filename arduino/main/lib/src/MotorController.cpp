@@ -17,6 +17,24 @@ MotorController::MotorController(
     this->enable_pin = enable_pin;
 }
 
+
+void MotorController::set_speed(signed char new_speed){
+    if (new_speed<0){
+        this->backward(new_speed);
+    }
+    else if (new_speed>0){
+        this->forward(new_speed);
+    }
+    else{
+        this->stop();
+    }
+    this->speed = new_speed;
+}
+
+signed char MotorController::get_speed(){
+    return this->speed;
+}
+
 void MotorController::stop() {
     this->disable_engine();
 }
