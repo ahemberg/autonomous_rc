@@ -2,7 +2,8 @@
 
 // Package structure definitions
 #define PACKAGE_HEADER		0xCA	// Jeff da CA!
-#define RETURN_DATA_MAX		4
+#define PACKAGE_EOL			0x0A	// \n
+#define PACKAGE_DATA_MAX	4
 
 
 // GET and SET commands
@@ -28,9 +29,13 @@
 #define ERROR_DATA_SIZE		12		// Package content: Invalid data size for the current command
 
 
-char angle = 0;
+char angle_tmp = 0;
 byte ultrasoundDistance=10;
 
+
+int SerialCommunication::readBuffer(byte * buffer, int bufferSize){
+	return Serial.readBytesUntil(PACKAGE_EOL, buffer, bufferSize);
+}
 
 byte SerialCommunication::calculateChecksum(byte header, byte command, byte dataSize, int packageByteSize){
 	return (header+command+dataSize+packageByteSize) % 255;
@@ -43,7 +48,7 @@ void SerialCommunication::sendPackage(byte command, byte dataSize = 0, byte * pa
 	responsePackage[1] = command;
 	responsePackage[2] = dataSize;
 	responsePackage[3+dataSize] = calculateChecksum(PACKAGE_HEADER,command,dataSize,4+dataSize);
-	responsePackage[4+dataSize] = 0x0A; // eol (\n)
+	responsePackage[4+dataSize] = PACKAGE_EOL;
 
 	if (dataSize>0) {
 		for (int i = 0; i < dataSize; ++i) {
@@ -63,7 +68,7 @@ void SerialCommunication::processPackage(byte * Package){
 	byte command = Package[1];
 	byte dataSize = Package[2];
 	byte inputData[dataSize];
-	byte outputData[RETURN_DATA_MAX];
+	byte outputData[PACKAGE_DATA_MAX];
 
 	if (dataSize>0) {
 		for (int i = 0; i < dataSize; ++i) {
@@ -80,13 +85,13 @@ void SerialCommunication::processPackage(byte * Package){
 			break;
 
 		case GET_ANGLE:
-			outputData[0] = (byte)angle;
+			outputData[0] = (byte)angle_tmp;
 			sendPackage(command, 1, outputData);
 			break;
 
 		case GET_SPEEDANGLE:
 			outputData[0] = (byte)mc->get_speed();
-			outputData[1] = (byte)angle;
+			outputData[1] = (byte)angle_tmp;
 			sendPackage(command, 2, outputData);
 			break;
 
@@ -98,7 +103,7 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case GET_STATUS:
 			outputData[0] = (byte)mc->get_speed();
-			outputData[1] = (byte)angle;
+			outputData[1] = (byte)angle_tmp;
 			outputData[2] = ultrasoundDistance;
 			outputData[3] = ur->has_lock();
 			sendPackage(command, 4, outputData);
@@ -119,7 +124,7 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case SET_ANGLE:
 			if (dataSize==1) {
-				angle = (char)inputData[0];
+				angle_tmp = (char)inputData[0];
 				sendPackage(ACK_OK);
 			}
 			else {
@@ -130,7 +135,7 @@ void SerialCommunication::processPackage(byte * Package){
 		case SET_SPEEDANGLE:
 			if (dataSize==2) {
 				mc->set_speed(inputData[0]);
-				angle = (char)inputData[1];
+				angle_tmp = (char)inputData[1];
 				sendPackage(ACK_OK);
 			}
 			else {

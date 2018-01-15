@@ -3,9 +3,14 @@
 #include <MotorController.h>
 #include <ServoController.h>
 #include <pin_definitions.h>
+#include <SerialCommunication.h>
+
+#define BUFFER_SIZE 10   // maximum number of bytes to read from serial port
 
 
-short int speed = 0, angle = 0, old_angle = 100;
+byte buffer[BUFFER_SIZE];
+int bytesRead;
+short int angle = 0, old_angle = 100;
 bool stopped = false;
 
 MotorController mc = MotorController(INPUT1_MOTOR, INPUT2_MOTOR, ENABLE_MOTOR);
@@ -13,6 +18,8 @@ ServoController sc = ServoController(
     PWM_SERVO, ENABLE_SERVO, SERVO_AIN1, SERVO_AIN2, 80, SERVO_MEAS
 );
 UltraSoundReader us_reader = UltraSoundReader(TRIG, ECHO);
+SerialCommunication scom = SerialCommunication(&mc, &sc, &us_reader);
+
 
 void setup() {
     Serial.begin(9600);
@@ -23,22 +30,10 @@ void loop() {
     us_reader.read_sensor();
 
     if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
-        speed = 0;
+        mc.set_speed(0);
     }
 
-    // if (speed ==  -100) {
-    //     mc.backward(200);
-    //     stopped = false;
-    // } else if (speed == 100) {
-    //     mc.forward(200);
-    //     stopped = false;
-    // } else if (!stopped) {
-    //     mc.break_engine();
-    //     delay(100);
-    //     mc.disable_engine();
-    //     stopped = true;
-    // }
-
+    // TODO: move this to scom.processPackage()
     if (angle >= -100 && angle <= 100 && angle != old_angle) {
         sc.set_goal(angle);
         old_angle = angle;
@@ -47,41 +42,12 @@ void loop() {
 }
 
 void serialEvent() {
-    char command;
+    bytesRead = scom.readBuffer(buffer, BUFFER_SIZE);  // read serial port into buffer
 
-    while (Serial.available()) {
-        command = (char)Serial.read();
+    byte receivedPackage[bytesRead];  // initiate package byte array
+    memcpy(receivedPackage, buffer, bytesRead);  // copy data from buffer to package
 
-        switch (command) {
-            case 'a':
-              angle = -100;
-              break;
-            case 'd':
-              angle = 100;
-              break;
-            case 'x':
-              angle = 0;
-              break;
-            case 'w':
-              speed = 100;
-              break;
-            case 's':
-              speed = -100;
-              break;
-            case 'q':
-              speed = 0;
-              break;
-            default:
-              angle = 0;
-              speed = 0;
-              break;
-        }
-        Serial.print(command);
-        Serial.print(':');
-        Serial.print(angle);
-        Serial.print(':');
-        Serial.print(speed);
-        Serial.println();
+    if (scom.validatePackage(receivedPackage, bytesRead)==0){
+        scom.processPackage(receivedPackage);
     }
-
 }

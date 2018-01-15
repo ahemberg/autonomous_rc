@@ -11,7 +11,7 @@ UltraSoundReader::UltraSoundReader(int trigger_pin, int echo_pin) {
 }
 
 void UltraSoundReader::read_sensor() {
-	digitalWrite(this->trigger, HIGH); 
+	digitalWrite(this->trigger, HIGH);
     delayMicroseconds(5);
     digitalWrite(this->trigger, LOW);
     this->distance = pulseIn(this->echo, HIGH, 50000);

@@ -1,6 +1,5 @@
-/*
- * Some kind of file explanation
- */
+#ifndef UltraSoundReader_h
+#define UltraSoundReader_h
 
 class UltraSoundReader {
     private:
@@ -14,3 +13,5 @@ class UltraSoundReader {
         long get_distance();
         bool has_lock();
 };
+
+#endif

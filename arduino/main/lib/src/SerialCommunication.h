@@ -10,6 +10,7 @@ class SerialCommunication {
 	public:
 		SerialCommunication(MotorController * mCtrl, ServoController * sCtrl, UltraSoundReader * usReader)
 			: mc(mCtrl), sc(sCtrl), ur(usReader){}
+		int readBuffer(byte * buffer, int bufferSize);
 		byte validatePackage(byte * Package, int packageByteSize);
 		void processPackage(byte * Package);
 		void sendPackage(byte command, byte dataSize, byte * packageData);
