@@ -28,10 +28,8 @@
 #define ERROR_DATA_SIZE		12		// Package content: Invalid data size for the current command
 
 
-bool new_speed, new_angle;
-char speed, angle;
+char angle = 0;
 byte ultrasoundDistance=10;
-byte hasLock=0;
 
 
 byte SerialCommunication::calculateChecksum(byte header, byte command, byte dataSize, int packageByteSize){
@@ -39,12 +37,13 @@ byte SerialCommunication::calculateChecksum(byte header, byte command, byte data
 }
 
 void SerialCommunication::sendPackage(byte command, byte dataSize = 0, byte * packageData = NULL){
-	byte responsePackage[4+dataSize];
+	byte responsePackage[5+dataSize];
 
 	responsePackage[0] = PACKAGE_HEADER;
 	responsePackage[1] = command;
 	responsePackage[2] = dataSize;
 	responsePackage[3+dataSize] = calculateChecksum(PACKAGE_HEADER,command,dataSize,4+dataSize);
+	responsePackage[4+dataSize] = 0x0A; // eol (\n)
 
 	if (dataSize>0) {
 		for (int i = 0; i < dataSize; ++i) {
@@ -52,12 +51,7 @@ void SerialCommunication::sendPackage(byte command, byte dataSize = 0, byte * pa
 		}
 	}
 
-	for (unsigned int i = 0; i < sizeof(responsePackage); ++i){
-		Serial.print(responsePackage[i]);
-	}
-	Serial.println();
-	// Serial.println(responsePackage);
-	// std::cout << "Sending response package (" << sizeof(responsePackage) << "): " << responsePackage << std::endl;
+	Serial.write(responsePackage, 5+dataSize);
 }
 
 void SerialCommunication::sendErrorPackage(byte errorCode){
@@ -98,7 +92,7 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case GET_ULTRAREADER:
 			outputData[0] = ultrasoundDistance;
-			outputData[1] = hasLock;
+			outputData[1] = ur->has_lock();
 			sendPackage(command, 2, outputData);
 			break;
 
@@ -106,7 +100,7 @@ void SerialCommunication::processPackage(byte * Package){
 			outputData[0] = (byte)mc->get_speed();
 			outputData[1] = (byte)angle;
 			outputData[2] = ultrasoundDistance;
-			outputData[3] = hasLock;
+			outputData[3] = ur->has_lock();
 			sendPackage(command, 4, outputData);
 			break;
 
@@ -114,8 +108,8 @@ void SerialCommunication::processPackage(byte * Package){
 		// SET PACKAGES
 		case SET_SPEED:
 			if (dataSize==1) {
-				speed = (char)inputData[0];
-				new_speed = true;
+				// speed = (char)inputData[0];
+				mc->set_speed(inputData[0]);
 				sendPackage(ACK_OK);
 			}
 			else {
@@ -126,7 +120,6 @@ void SerialCommunication::processPackage(byte * Package){
 		case SET_ANGLE:
 			if (dataSize==1) {
 				angle = (char)inputData[0];
-				new_angle = true;
 				sendPackage(ACK_OK);
 			}
 			else {
@@ -136,10 +129,8 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case SET_SPEEDANGLE:
 			if (dataSize==2) {
-				speed = (char)inputData[0];
+				mc->set_speed(inputData[0]);
 				angle = (char)inputData[1];
-				new_speed = true;
-				new_angle = true;
 				sendPackage(ACK_OK);
 			}
 			else {
