@@ -38,7 +38,9 @@ class SerialCommunication:
         self.ser.write(package)
 
     def getResponsePackage(self):
-        package = self.ser.readline()
+        tmp = self.ser.readline()[:-1]
+        package = bytearray()
+        package.extend(map(ord, tmp))
         validPkg = self.validatePackage(package)
         if validPkg == 0:
             if package[1] == self.ACK_OK:

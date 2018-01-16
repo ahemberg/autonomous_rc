@@ -31,7 +31,7 @@ class Brain:
     # [header, command, dataSize, data0, ..., dataN, checksum]
     def getSpeed(self):
         self.scom.sendPackage(self.GET_SPEED)
-        sleep(0.1)
+        sleep(0.3)
         respPkg = self.scom.getResponsePackage()
         if len(respPkg) > 0:
             if (respPkg[1] == self.GET_SPEED) & (respPkg[2] == 1):
