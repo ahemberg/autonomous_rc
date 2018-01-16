@@ -45,10 +45,10 @@ class SerialCommunication:
                 print("SET: Success")
                 package = []
             elif package[1] == self.ACK_ERROR:
-                print("COMMAND FAILED: " + package[2])
+                print("COMMAND FAILED: {}".format(package[2]))
                 package = []
         else:
-            print("INVALID RESPONSE PACKAGE: " + validPkg)
+            print("INVALID RESPONSE PACKAGE: {}".format(validPkg))
             package = []
 
         return package

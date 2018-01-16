@@ -33,12 +33,15 @@ class Brain:
         self.scom.sendPackage(self.GET_SPEED)
         sleep(0.1)
         respPkg = self.scom.getResponsePackage()
-        if respPkg > 0:
+        if len(respPkg) > 0:
             if (respPkg[1] == self.GET_SPEED) & (respPkg[2] == 1):
                 # TODO: Convert respPkg[3] to int/signed char
                 speed = respPkg[3]
             else:
-                speed = []
+                speed = -999
                 print("GET SPEED: Invalid data size")
+        else:
+            print("GET SPEED: Error")
+            speed = -999
 
         return speed
