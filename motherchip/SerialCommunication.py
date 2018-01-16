@@ -18,7 +18,7 @@ class SerialCommunication:
 
     def __createPackage(self, command, data):
         dataSize = len(data)
-        package = bytearray(4+dataSize)
+        package = bytearray(5+dataSize)
         package[0] = self.PACKAGE_HEADER
         package[1] = command
         package[2] = dataSize
