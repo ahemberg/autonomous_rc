@@ -13,7 +13,7 @@ class SerialCommunication:
     def __init__(self):
         self.ser = serial.Serial('/dev/ttyS0', 9600)
 
-    def __calculateChecksum(header, command, dataSize, pkgSize):
+    def __calculateChecksum(self, header, command, dataSize, pkgSize):
         return (header+command+dataSize+pkgSize) % 255
 
     def __createPackage(self, command, data):
