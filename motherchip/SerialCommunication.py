@@ -3,6 +3,7 @@ import serial
 
 class SerialCommunication:
     PACKAGE_HEADER = 0xCA   # Jeff da CA!
+    PACKAGE_EOL = 0x0A
     ERROR_PKG_SIZE = 1      # Validation: Package too small
     ERROR_PKG_HEADER = 2    # Validation: Invalid package header
     ERROR_PKG_CHKSUM = 3    # Validation: Invalid checksum
@@ -21,9 +22,10 @@ class SerialCommunication:
         package[0] = self.PACKAGE_HEADER
         package[1] = command
         package[2] = dataSize
-        package[dataSize-1] = self.__calculateChecksum(self.PACKAGE_HEADER,
+        package[3+dataSize] = self.__calculateChecksum(self.PACKAGE_HEADER,
                                                        command, dataSize,
                                                        dataSize+4)
+        package[4+dataSize] = self.PACKAGE_EOL
 
         if dataSize > 0:
             for i in range(0, dataSize):
@@ -32,7 +34,7 @@ class SerialCommunication:
         return package
 
     def sendPackage(self, command, data=[]):
-        package = self.__createPackage(self, command, data)
+        package = self.__createPackage(command, data)
         self.ser.write(package)
 
     def getResponsePackage(self):
