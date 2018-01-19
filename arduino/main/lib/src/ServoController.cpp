@@ -17,7 +17,14 @@ ServoController::ServoController(
     this->in2_pin = in2_pin;
     this->duty = duty; // TODO: Change this ??
     this->analog_pin = analog_pin;
+    this->direction = 0;
 }
+
+
+int ServoController::get_direction() {
+    return this->direction;
+}
+
 
 // LOW LEVEL NITTY/GRITTY STUFFS
 
@@ -66,9 +73,9 @@ void ServoController::turn_right() {
     }
 }
 
-// TODO: Rewrite this function!
-void ServoController::set_goal(int direction) {
-	this->goal = (MAX_RIGHT-MAX_LEFT) * (float)(direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
+void ServoController::set_goal(int new_direction) {
+	this->goal = (MAX_RIGHT-MAX_LEFT) * (float)(new_direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
+    this->direction = new_direction;
 }
 
 void ServoController::reach_goal() {

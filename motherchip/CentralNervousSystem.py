@@ -16,24 +16,23 @@ class Brain:
     GET_STATUS = 200
 
     def __init__(self):
-        self.sc = SpinalCord()
+        self.spine = SpinalCord()
 
     # SET commands
     def setSpeed(self, speed):
-        sign = 1 if speed > 0 else 0
-        self.sc.sendImpulse(self.SET_SPEED, [sign, abs(speed)])
+        speed = speed + 128
+        self.spine.sendImpulse(self.SET_SPEED, speed)
         sleep(0.1)
         # self.sc.readImpulse()
 
     # GET commands
     def getSpeed(self):
-        self.sc.sendImpulse(self.GET_SPEED)
+        self.spine.sendImpulse(self.GET_SPEED)
         sleep(0.3)
-        respPkg = self.sc.readImpulse()
+        respPkg = self.spine.readImpulse()
         if len(respPkg) > 0:
             if (respPkg[1] == self.GET_SPEED) & (respPkg[2] == 2):
-                sign = 1 if respPkg[3] > 0 else -1
-                speed = sign * respPkg[4]
+                speed = respPkg[3] - 128
             else:
                 speed = -999
                 print("GET SPEED: Invalid data size")
@@ -47,7 +46,7 @@ class Brain:
 # Handles serial communication
 class SpinalCord:
     PACKAGE_HEADER = 0xCA   # Jeff da CA!
-    PACKAGE_EOL = 0x0A      # \n
+    PACKAGE_EOL = 0x0A      # End-of-line character (\n)
     ERROR_PKG_SIZE = 1      # Validation: Package too small
     ERROR_PKG_HEADER = 2    # Validation: Invalid package header
     ERROR_PKG_CHKSUM = 3    # Validation: Invalid checksum
@@ -62,13 +61,18 @@ class SpinalCord:
         return (header+command+dataSize+pkgSize) % 255
 
     def __createImpulse(self, command, data):
+        # Make sure that data is a list
         if not isinstance(data, (list,)):
             data = [data]
+
+        # Build package as a list [header, command, dataSize, data, chksum]
         dataSize = len(data)
         packageDec = [self.PACKAGE_HEADER, command, dataSize]
         packageDec.extend(data)
         packageDec.append(self.__countNeurons(self.PACKAGE_HEADER, command,
                                               dataSize, dataSize+4))
+
+        # Convert list to list of bytes
         package = bytearray(packageDec)
 
         return package
@@ -82,11 +86,16 @@ class SpinalCord:
         # self.ser.flush()
 
     def readImpulse(self):
+        # Read serial port as string
         tmp = self.ser.readline()[:-1]
+
+        # Convert string to list of bytes
         package = bytearray()
         package.extend(map(ord, tmp))
         print(":: Read impulse:")
         print(repr(package))
+
+        # Validate package
         validPkg = self.validateImpulse(package)
         if validPkg == 0:
             if package[1] == self.ACK_OK:

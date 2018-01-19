@@ -27,6 +27,7 @@
 #define ERROR_PKG_CHKSUM	3		// Validation: Invalid checksum
 #define ERROR_UNKN_CMD		11		// Package content: Undefined command
 #define ERROR_DATA_SIZE		12		// Package content: Invalid data size for the current command
+#define ERROR_OUT_OF_BOUND	13		// PAckage content: Value too large
 
 
 char angle_tmp = 0;
@@ -69,6 +70,8 @@ void SerialCommunication::processPackage(byte * Package){
 	byte dataSize = Package[2];
 	byte inputData[dataSize];
 	byte outputData[PACKAGE_DATA_MAX];
+	signed char speed;
+	int angle;
 
 	if (dataSize>0) {
 		for (int i = 0; i < dataSize; ++i) {
@@ -80,18 +83,18 @@ void SerialCommunication::processPackage(byte * Package){
 	switch (command) {
 		// GET PACKAGES
 		case GET_SPEED: // Get speed
-			outputData[0] = (byte)mc->get_speed();
+			outputData[0] = mc->get_speed() + 128;
 			sendPackage(command, 1, outputData);
 			break;
 
 		case GET_ANGLE:
-			outputData[0] = (byte)angle_tmp;
+			outputData[0] = (byte)(sc->get_direction() + 128);
 			sendPackage(command, 1, outputData);
 			break;
 
 		case GET_SPEEDANGLE:
-			outputData[0] = (byte)mc->get_speed();
-			outputData[1] = (byte)angle_tmp;
+			outputData[0] = mc->get_speed() + 128;
+			outputData[1] = (byte)(sc->get_direction() + 128);
 			sendPackage(command, 2, outputData);
 			break;
 
@@ -102,8 +105,8 @@ void SerialCommunication::processPackage(byte * Package){
 			break;
 
 		case GET_STATUS:
-			outputData[0] = (byte)mc->get_speed();
-			outputData[1] = (byte)angle_tmp;
+			outputData[0] = mc->get_speed() + 128;
+			outputData[1] = (byte)(sc->get_direction() + 128);
 			outputData[2] = ultrasoundDistance;
 			outputData[3] = ur->has_lock();
 			sendPackage(command, 4, outputData);
@@ -113,9 +116,14 @@ void SerialCommunication::processPackage(byte * Package){
 		// SET PACKAGES
 		case SET_SPEED:
 			if (dataSize==1) {
-				// speed = (char)inputData[0];
-				mc->set_speed(inputData[0]);
-				sendPackage(ACK_OK);
+				speed = inputData[0] - 128;
+				if (abs(speed) > 100){
+					sendErrorPackage(ERROR_OUT_OF_BOUND);
+				}
+				else {
+					mc->set_speed(speed);
+					sendPackage(ACK_OK);
+				}
 			}
 			else {
 				sendErrorPackage(ERROR_DATA_SIZE);
@@ -124,8 +132,14 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case SET_ANGLE:
 			if (dataSize==1) {
-				angle_tmp = (char)inputData[0];
-				sendPackage(ACK_OK);
+				angle = inputData[0] - 128;
+				if (abs(angle) > 100){
+					sendErrorPackage(ERROR_OUT_OF_BOUND);
+				}
+				else {
+					sc->set_goal(angle);
+					sendPackage(ACK_OK);
+				}
 			}
 			else {
 				sendErrorPackage(ERROR_DATA_SIZE);
@@ -134,9 +148,16 @@ void SerialCommunication::processPackage(byte * Package){
 
 		case SET_SPEEDANGLE:
 			if (dataSize==2) {
-				mc->set_speed(inputData[0]);
-				angle_tmp = (char)inputData[1];
-				sendPackage(ACK_OK);
+				speed = inputData[0] - 128;
+				angle = inputData[1] - 128;
+				if ((abs(speed) > 100) || (abs(angle) > 100)){
+					sendErrorPackage(ERROR_OUT_OF_BOUND);
+				}
+				else {
+					mc->set_speed(speed);
+					sc->set_goal(angle);
+					sendPackage(ACK_OK);
+				}
 			}
 			else {
 				sendErrorPackage(ERROR_DATA_SIZE);

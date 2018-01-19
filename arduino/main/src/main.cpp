@@ -10,7 +10,6 @@
 
 byte buffer[BUFFER_SIZE];
 int bytesRead;
-short int angle = 0, old_angle = 100;
 bool stopped = false;
 
 MotorController mc = MotorController(INPUT1_MOTOR, INPUT2_MOTOR, ENABLE_MOTOR);
@@ -33,11 +32,6 @@ void loop() {
         mc.set_speed(0);
     }
 
-    // TODO: move this to scom.processPackage()
-    if (angle >= -100 && angle <= 100 && angle != old_angle) {
-        sc.set_goal(angle);
-        old_angle = angle;
-    }
     sc.reach_goal();
 }
 
