@@ -14,15 +14,16 @@ bool stopped = false;
 
 MotorController mc = MotorController(INPUT1_MOTOR, INPUT2_MOTOR, ENABLE_MOTOR);
 ServoController sc = ServoController(
-    PWM_SERVO, ENABLE_SERVO, SERVO_AIN1, SERVO_AIN2, 80, SERVO_MEAS
+    PWM_SERVO, ENABLE_SERVO, SERVO_AIN1, SERVO_AIN2, 200, SERVO_MEAS
 );
 UltraSoundReader us_reader = UltraSoundReader(TRIG, ECHO);
 SerialCommunication scom = SerialCommunication(&mc, &sc, &us_reader);
 
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial.setTimeout(50);
+    sc.set_goal(0);
 }
 
 void loop() {

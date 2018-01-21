@@ -30,7 +30,6 @@
 #define ERROR_OUT_OF_BOUND	13		// PAckage content: Value too large
 
 
-char angle_tmp = 0;
 byte ultrasoundDistance=10;
 
 

@@ -23,7 +23,7 @@ class Brain:
         speed = speed + 128
         self.spine.sendImpulse(self.SET_SPEED, speed)
         sleep(0.1)
-        self.sc.readImpulse()
+        self.spine.readImpulse()
 
     # GET commands
     def getSpeed(self):
