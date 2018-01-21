@@ -1,6 +1,8 @@
 import serial
-from time import sleep
+from time import sleep, time
 
+GET_WAIT_TIME = 0.005
+SET_WAIT_TIME = 0.05
 
 # High level functions
 class Brain:
@@ -15,6 +17,7 @@ class Brain:
 
     GET_STATUS = 200
 
+
     def __init__(self):
         self.spine = SpinalCord()
 
@@ -22,26 +25,51 @@ class Brain:
     def setSpeed(self, speed):
         speed = speed + 128
         self.spine.sendImpulse(self.SET_SPEED, speed)
-        sleep(0.1)
-        self.sc.readImpulse()
+        sleep(SET_WAIT_TIME)
+        self.spine.readImpulse()
+
+    def setDirection(self, direction):
+        direction = direction + 128
+        self.spine.sendImpulse(self.SET_ANGLE, direction)
+        sleep(SET_WAIT_TIME)
+        self.spine.readImpulse()
 
     # GET commands
     def getSpeed(self):
         self.spine.sendImpulse(self.GET_SPEED)
-        sleep(0.3)
+        sleep(GET_WAIT_TIME)
         respPkg = self.spine.readImpulse()
         if len(respPkg) > 0:
-            if (respPkg[1] == self.GET_SPEED) & (respPkg[2] == 2):
+            if (respPkg[1] == self.GET_SPEED) & (respPkg[2] == 1):
                 speed = respPkg[3] - 128
             else:
-                speed = -999
+                speed = None
                 print("GET SPEED: Invalid data size")
         else:
             print("GET SPEED: Error")
-            speed = -999
+            speed = None
 
         return speed
 
+    def getDirection(self):
+        t = time()
+        self.spine.sendImpulse(self.GET_ANGLE)
+        print(time()-t)
+        t2 = time()
+        #sleep(SET_WAIT_TIME)
+        respPkg = self.spine.readImpulse()
+        print(time()-t2)
+        if len(respPkg) > 0:
+            if (respPkg[1] == self.GET_ANGLE) & (respPkg[2] == 1):
+                speed = respPkg[3] - 128
+            else:
+                speed = None
+                print("GET ANGLE: Invalid data size")
+        else:
+            print("GET ANGLE: Error")
+            speed = None
+
+        return speed
 
 # Handles serial communication
 class SpinalCord:
@@ -54,7 +82,7 @@ class SpinalCord:
     ACK_OK = 255
 
     def __init__(self):
-        self.ser = serial.Serial('/dev/ttyS0', baudrate=9600, timeout=0.1)
+        self.ser = serial.Serial('/dev/ttyS0', baudrate=115200, timeout=0.1)
         # print("dbg mode")
 
     def __countNeurons(self, header, command, dataSize, pkgSize):
@@ -80,20 +108,21 @@ class SpinalCord:
     def sendImpulse(self, command, data=[]):
         package = self.__createImpulse(command, data)
         package.append(self.PACKAGE_EOL)
-        print(":: Sending impulse:")
-        print(repr(package))
+        #print(":: Sending impulse:")
+        #print(repr(package))
         self.ser.write(package)
         self.ser.flush()
 
     def readImpulse(self):
         # Read serial port as string
-        tmp = self.ser.readline()[:-1]
-
+        package = self.ser.readline()[:-1]
+        #print(tmp)
+        
         # Convert string to list of bytes
-        package = bytearray()
-        package.extend(map(ord, tmp))
-        print(":: Read impulse:")
-        print(repr(package))
+        #package = bytearray()
+        #package.extend(list(map(ord, tmp)))
+        #print(":: Read impulse:")
+        #print(repr(package))
 
         # Validate package
         validPkg = self.validateImpulse(package)
