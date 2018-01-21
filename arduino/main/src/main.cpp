@@ -36,12 +36,14 @@ void loop() {
 }
 
 void serialEvent() {
-    bytesRead = scom.readBuffer(buffer, BUFFER_SIZE);  // read serial port into buffer
+    if (Serial.available() > 0) {
+        bytesRead = scom.readBuffer(buffer, BUFFER_SIZE);  // read serial port into buffer
 
-    byte receivedPackage[bytesRead];  // initiate package byte array
-    memcpy(receivedPackage, buffer, bytesRead);  // copy data from buffer to package
+        byte receivedPackage[bytesRead];  // initiate package byte array
+        memcpy(receivedPackage, buffer, bytesRead);  // copy data from buffer to package
 
-    if (scom.validatePackage(receivedPackage, bytesRead)==0){
-        scom.processPackage(receivedPackage);
+        if (scom.validatePackage(receivedPackage, bytesRead)==0){
+            scom.processPackage(receivedPackage);
+        }
     }
 }

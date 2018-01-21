@@ -1,4 +1,4 @@
-# import serial
+import serial
 from time import sleep
 
 
@@ -23,7 +23,7 @@ class Brain:
         speed = speed + 128
         self.spine.sendImpulse(self.SET_SPEED, speed)
         sleep(0.1)
-        # self.sc.readImpulse()
+        self.sc.readImpulse()
 
     # GET commands
     def getSpeed(self):
@@ -54,8 +54,8 @@ class SpinalCord:
     ACK_OK = 255
 
     def __init__(self):
-        # self.ser = serial.Serial('/dev/ttyS0', baudrate=9600, timeout=0.1)
-        print("dbg mode")
+        self.ser = serial.Serial('/dev/ttyS0', baudrate=9600, timeout=0.1)
+        # print("dbg mode")
 
     def __countNeurons(self, header, command, dataSize, pkgSize):
         return (header+command+dataSize+pkgSize) % 255
@@ -82,8 +82,8 @@ class SpinalCord:
         package.append(self.PACKAGE_EOL)
         print(":: Sending impulse:")
         print(repr(package))
-        # self.ser.write(package)
-        # self.ser.flush()
+        self.ser.write(package)
+        self.ser.flush()
 
     def readImpulse(self):
         # Read serial port as string
