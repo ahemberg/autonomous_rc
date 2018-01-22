@@ -3,7 +3,7 @@
 // Package structure definitions
 #define PACKAGE_HEADER		0xCA	// Jeff da CA!
 #define PACKAGE_EOL			0x0A	// \n
-#define PACKAGE_DATA_MAX	4
+#define PACKAGE_DATA_MAX	7
 
 
 // GET and SET commands
@@ -28,9 +28,6 @@
 #define ERROR_UNKN_CMD		11		// Package content: Undefined command
 #define ERROR_DATA_SIZE		12		// Package content: Invalid data size for the current command
 #define ERROR_OUT_OF_BOUND	13		// PAckage content: Value too large
-
-
-byte ultrasoundDistance=10;
 
 
 int SerialCommunication::readBuffer(byte * buffer, int bufferSize){
@@ -71,6 +68,7 @@ void SerialCommunication::processPackage(byte * Package){
 	byte outputData[PACKAGE_DATA_MAX];
 	signed char speed;
 	int angle;
+	long distance;
 
 	if (dataSize>0) {
 		for (int i = 0; i < dataSize; ++i) {
@@ -98,17 +96,25 @@ void SerialCommunication::processPackage(byte * Package){
 			break;
 
 		case GET_ULTRAREADER:
-			outputData[0] = ultrasoundDistance;
-			outputData[1] = ur->has_lock();
-			sendPackage(command, 2, outputData);
+			distance = ur->get_distance();
+			outputData[0] = (distance & 0x000000FF);
+			outputData[1] = (distance & 0x0000FF00) >> 8;
+			outputData[2] = (distance & 0x00FF0000) >> 16;
+			outputData[3] = (distance & 0xFF000000) >> 24;
+			outputData[4] = ur->has_lock();
+			sendPackage(command, 5, outputData);
 			break;
 
 		case GET_STATUS:
+			distance = ur->get_distance();
 			outputData[0] = mc->get_speed() + 128;
 			outputData[1] = (byte)(sc->get_direction() + 128);
-			outputData[2] = ultrasoundDistance;
-			outputData[3] = ur->has_lock();
-			sendPackage(command, 4, outputData);
+			outputData[2] = (distance & 0x000000FF);
+			outputData[3] = (distance & 0x0000FF00) >> 8;
+			outputData[4] = (distance & 0x00FF0000) >> 16;
+			outputData[5] = (distance & 0xFF000000) >> 24;
+			outputData[6] = ur->has_lock();
+			sendPackage(command, 7, outputData);
 			break;
 
 

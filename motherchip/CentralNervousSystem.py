@@ -34,6 +34,13 @@ class Brain:
         sleep(SET_WAIT_TIME)
         self.spine.readImpulse()
 
+    def setSpeedDir(self, speed, direction):
+        speed = speed + 128
+        direction = direction + 128
+        self.spine.sendImpulse(self.SET_SPEEDANGLE, [speed, direction])
+        sleep(SET_WAIT_TIME)
+        self.spine.readImpulse()
+
     # GET commands
     def getSpeed(self):
         self.spine.sendImpulse(self.GET_SPEED)
@@ -70,6 +77,57 @@ class Brain:
             speed = None
 
         return speed
+
+    def getSpeedDir(self):
+        self.spine.sendImpulse(self.GET_SPEEDANGLE)
+        sleep(GET_WAIT_TIME)
+        respPkg = self.spine.readImpulse()
+        if len(respPkg) > 0:
+            if (respPkg[1] == self.GET_SPEEDANGLE) & (respPkg[2] == 2):
+                speedDir = [respPkg[3] - 128, respPkg[4] - 128]
+            else:
+                speedDir = None
+                print("GET SPEED: Invalid data size")
+        else:
+            print("GET SPEED: Error")
+            speedDir = None
+
+        return speedDir
+
+    def getDistance(self):
+        self.spine.sendImpulse(self.GET_ULTRAREADER)
+        sleep(GET_WAIT_TIME)
+        respPkg = self.spine.readImpulse()
+        if len(respPkg) > 0:
+            if (respPkg[1] == self.GET_ULTRAREADER) & (respPkg[2] == 5):
+                distance = int.from_bytes(respPkg[3:6], byteorder='little')
+            else:
+                distance = None
+                print("GET SPEED: Invalid data size")
+        else:
+            print("GET SPEED: Error")
+            distance = None
+
+        return distance
+
+    def getStatus(self):
+        self.spine.sendImpulse(self.GET_STATUS)
+        sleep(GET_WAIT_TIME)
+        respPkg = self.spine.readImpulse()
+        if len(respPkg) > 0:
+            if (respPkg[1] == self.GET_STATUS) & (respPkg[2] == 7):
+                # [speed, angle, dist_LSB, dist, dist, dist_MSB, has_lock()]
+                status = [respPkg[3] - 128, respPkg[4] - 128]
+                status.append(int.from_bytes(respPkg[5:8], byteorder='little'))
+                status.append(respPkg[9])
+            else:
+                status = None
+                print("GET SPEED: Invalid data size")
+        else:
+            print("GET SPEED: Error")
+            status = None
+
+        return status
 
 
 # Handles serial communication
@@ -117,13 +175,6 @@ class SpinalCord:
     def readImpulse(self):
         # Read serial port as string
         package = self.ser.readline()[:-1]
-        # print(tmp)
-
-        # Convert string to list of bytes
-        # package = bytearray()
-        # package.extend(list(map(ord, tmp)))
-        # print(":: Read impulse:")
-        # print(repr(package))
 
         # Validate package
         validPkg = self.validateImpulse(package)
