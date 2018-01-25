@@ -3,7 +3,7 @@
 // Package structure definitions
 #define PACKAGE_HEADER		0xCA	// Jeff da CA!
 #define PACKAGE_EOL			0x0A	// \n
-#define PACKAGE_DATA_MAX	7
+#define PACKAGE_DATA_MAX	10
 
 
 // GET and SET commands
@@ -101,7 +101,7 @@ void SerialCommunication::processPackage(byte * Package){
 			outputData[1] = (distance & 0x0000FF00) >> 8;
 			outputData[2] = (distance & 0x00FF0000) >> 16;
 			outputData[3] = (distance & 0xFF000000) >> 24;
-			outputData[4] = ur->has_lock();
+			outputData[4] = ur->has_lock() ? 0x01 : 0x00;
 			sendPackage(command, 5, outputData);
 			break;
 
@@ -113,7 +113,7 @@ void SerialCommunication::processPackage(byte * Package){
 			outputData[3] = (distance & 0x0000FF00) >> 8;
 			outputData[4] = (distance & 0x00FF0000) >> 16;
 			outputData[5] = (distance & 0xFF000000) >> 24;
-			outputData[6] = ur->has_lock();
+			outputData[6] = ur->has_lock() ? 0x01 : 0x00;
 			sendPackage(command, 7, outputData);
 			break;
 

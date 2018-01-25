@@ -17,7 +17,19 @@ def main():
     # brain.setDirection(-100)
     # for i in range(100):
     #    print(brain.getDirection())
-    print(brain.getDirection())
+    brain.set_direction(0)
+    while 1:
+        brain.set_speed_dir(100, -100)
+        sleep(1)
+        brain.set_speed_dir(0, 0)
+        sleep(1)
+        brain.set_speed_dir(-100, 100)
+        sleep(1)
+        brain.set_speed_dir(0, 0)
+        sleep(1)
+    # print(brain.set_speed(0))
+    # sleep(20)
+    # print(brain.set_speed(0))
 
 
 if __name__ == "__main__":
