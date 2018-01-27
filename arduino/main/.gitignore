@@ -1,7 +1,0 @@
-.pioenvs
-.piolibdeps
-.clang_complete
-.gcc-flags.json
-*.gch
-*.hex
-travis.yml
