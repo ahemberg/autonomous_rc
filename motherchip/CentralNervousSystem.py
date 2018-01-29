@@ -1,8 +1,7 @@
 import serial
 from time import sleep, time
 
-GET_WAIT_TIME = 0.0
-SET_WAIT_TIME = 0.0
+SERIAL_DELAY_TIME = 0.0  # [s] Delay between writing and reading serial port
 
 PACKAGE_HEADER = 0xCA  # Jeff da CA!
 PACKAGE_EOL = 0x0A  # End-of-line character (\n)
@@ -30,53 +29,43 @@ class Brain:
     def __init__(self):
         self.spine = SpinalCord()
 
-    # SET commands
+    # SET commands (returns 0 if OK)
     def set_speed(self, speed):
         speed = speed + 128
         self.spine.send_impulse(SET_SPEED, speed)
-        self.spine.read_impulse()
+        return self.spine.read_impulse()
 
     def set_direction(self, direction):
         direction = direction + 128
         self.spine.send_impulse(SET_ANGLE, direction)
-        self.spine.read_impulse()
+        return self.spine.read_impulse()
 
     def set_speed_dir(self, speed, direction):
         speed = speed + 128
         direction = direction + 128
         self.spine.send_impulse(SET_SPEEDANGLE, [speed, direction])
-        self.spine.read_impulse()
+        return self.spine.read_impulse()
 
     # GET commands
     def get_speed(self):
+        speed = None
+
         self.spine.send_impulse(GET_SPEED)
-        sleep(GET_WAIT_TIME)
+        sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
-        if len(resp_pkg) > 0:
-            if (resp_pkg[1] == GET_SPEED) & (resp_pkg[2] == 1):
-                speed = resp_pkg[3] - 128
-            else:
-                speed = None
-                print("GET SPEED: Invalid data size")
-        else:
-            print("GET SPEED: Error")
-            speed = None
+        if len(resp_pkg) > 1:
+            speed = resp_pkg[3] - 128
 
         return speed
 
     def get_direction(self):
+        direction = None
+
         self.spine.send_impulse(GET_ANGLE)
-        sleep(GET_WAIT_TIME)
+        sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
-        if len(resp_pkg) > 0:
-            if (resp_pkg[1] == GET_ANGLE) & (resp_pkg[2] == 1):
-                direction = resp_pkg[3] - 128
-            else:
-                direction = None
-                print("GET DIRECTION: Invalid data size")
-        else:
-            print("GET DIRECTION: Error")
-            direction = None
+        if len(resp_pkg) > 1:
+            direction = resp_pkg[3] - 128
 
         return direction
 
@@ -84,53 +73,37 @@ class Brain:
         speed_dir = {'speed': None, 'direction': None}
 
         self.spine.send_impulse(GET_SPEEDANGLE)
-        sleep(GET_WAIT_TIME)
+        sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
-        if len(resp_pkg) > 0:
-            if (resp_pkg[1] == GET_SPEEDANGLE) & (resp_pkg[2] == 2):
-                speed_dir['speed'] = resp_pkg[3] - 128
-                speed_dir['direction'] = resp_pkg[4] - 128
-            else:
-                print("GET SPEED&DIR: Invalid data size")
-        else:
-            print("GET SPEED&DIR: Error")
+        if len(resp_pkg) > 1:
+            speed_dir['speed'] = resp_pkg[3] - 128
+            speed_dir['direction'] = resp_pkg[4] - 128
 
         return speed_dir
 
     def get_distance(self):
-        us_status = {'distance': None, 'lock': None}
+        ultrasound_reader = {'distance': None, 'lock': None}
 
         self.spine.send_impulse(GET_ULTRAREADER)
-        sleep(GET_WAIT_TIME)
+        sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
-        if len(resp_pkg) > 0:
-            if (resp_pkg[1] == GET_ULTRAREADER) & (resp_pkg[2] == 5):
-                us_status['distance'] = int.from_bytes(resp_pkg[3:6], byteorder='little')
-                us_status['lock'] = resp_pkg[7]
-            else:
-                print("GET DISTANCE: Invalid data size")
-        else:
-            print("GET DISTANCE: Error")
+        if len(resp_pkg) > 1:
+            ultrasound_reader['distance'] = int.from_bytes(resp_pkg[3:6], byteorder='little')
+            ultrasound_reader['lock'] = resp_pkg[7]
 
-        return us_status
+        return ultrasound_reader
 
     def get_status(self):
         status = {'speed': None, 'distance': None, 'direction': None, 'lock': None}
 
         self.spine.send_impulse(GET_STATUS)
-        sleep(GET_WAIT_TIME)
+        sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
-        if len(resp_pkg) > 0:
-            if (resp_pkg[1] == GET_STATUS) & (resp_pkg[2] == 7):
-                # [speed, angle, dist_LSB, dist, dist, dist_MSB, has_lock()]
-                status['speed'] = resp_pkg[3] - 128
-                status['direction'] = resp_pkg[4] - 128
-                status['distance'] = int.from_bytes(resp_pkg[5:8], byteorder='little')
-                status['lock'] = resp_pkg[9]
-            else:
-                print("GET STATUS: Invalid data size")
-        else:
-            print("GET STATUS: Error")
+        if len(resp_pkg) > 1:
+            status['speed'] = resp_pkg[3] - 128
+            status['direction'] = resp_pkg[4] - 128
+            status['distance'] = int.from_bytes(resp_pkg[5:8], byteorder='little')
+            status['lock'] = resp_pkg[9]
 
         return status
 
@@ -139,7 +112,6 @@ class Brain:
 class SpinalCord:
     def __init__(self):
         self.ser = serial.Serial('/dev/ttyS0', baudrate=115200, timeout=0.1)
-        # print("dbg mode")
 
     @staticmethod
     def __count_neurons(header, command, data_size, pkg_size):
@@ -175,16 +147,13 @@ class SpinalCord:
         valid_pkg = self.validate_impulse(package)
         if valid_pkg == 0:
             if package[1] == ACK_OK:
-                print("SUCCESS: Settings updated")
-                package = []
+                package = 0
             elif package[1] == ACK_ERROR:
-                print("ERROR: Received error package #{}".format(package[2]))
-                package = []
-            else:
-                print("SUCCESS: Received requested data")
+                print("ERROR: Microcontroller error #{}".format(package[2]))
+                package = package[2]
         else:
             print("ERROR. Broken response #{}".format(valid_pkg))
-            package = []
+            package = valid_pkg
 
         return package
 
