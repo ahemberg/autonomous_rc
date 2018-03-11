@@ -5,7 +5,7 @@ import numpy as np
 from collections import deque
 
 lemoncapture = [(17, 153, 103), (41, 194, 232)]
-pencap = [(170, 142, 124), (179, 189, 197)]
+pencap = [(146, 125, 134), (179, 255, 255)]
 
 video = cv2.VideoCapture(0)
 
@@ -28,7 +28,7 @@ while True:
     if not ok:
         break
 
-    #frame = imutils.resize(frame, width=600)
+    frame = imutils.resize(frame, width=600)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     mask = cv2.inRange(hsv, greenLower, greenUpper)
