@@ -1,6 +1,6 @@
 // Defines for UltraSoundReader
 #define TRIG 11
-#define ECHO  12
+#define ECHO 12
 
 // Defines for ServoController
 #define ENABLE_SERVO 8
