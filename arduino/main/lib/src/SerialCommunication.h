@@ -9,7 +9,7 @@
 class SerialCommunication {
 	public:
 		SerialCommunication(MotorController * mCtrl, ServoController * sCtrl, UltraSoundReader * usReader)
-			: mc(mCtrl), sc(sCtrl), ur(usReader){}
+			: _mc(mCtrl), _sc(sCtrl), _ur(usReader) { }
 		int readBuffer(byte * buffer, int bufferSize);
 		byte validatePackage(byte * Package, int packageByteSize);
 		void processPackage(byte * Package);
@@ -17,9 +17,9 @@ class SerialCommunication {
 		void sendErrorPackage(byte errorCode);
 
 	private:
-		MotorController * mc;
-		ServoController * sc;
-		UltraSoundReader * ur;
+		MotorController * _mc;
+		ServoController * _sc;
+		UltraSoundReader * _ur;
 		byte calculateChecksum(byte header, byte command, byte dataSize, int packageByteSize);
 };
 

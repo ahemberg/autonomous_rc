@@ -3,8 +3,8 @@
 
 class UltraSoundReader {
     private:
-    	bool lock = false;
-        int trigger, echo, distance = 0;
+        bool _lock = false;
+        int _trigger, _echo, _distance = 0;
     protected:
 
     public:
