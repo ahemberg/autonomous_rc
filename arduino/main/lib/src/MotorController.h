@@ -11,8 +11,8 @@ class MotorController {
         void stop();
         void break_engine();
     private:
-        int input_pin_1, input_pin_2, enable_pin;
-        signed char speed;
+        int _input_pin_1, _input_pin_2, _enable_pin;
+        signed char _speed;
         void forward(char duty);
         void backward(char duty);
         void enable_engine();

@@ -80,40 +80,40 @@ void SerialCommunication::processPackage(byte * Package){
 	switch (command) {
 		// GET PACKAGES
 		case GET_SPEED: // Get speed
-			outputData[0] = mc->get_speed() + 128;
+			outputData[0] = _mc->get_speed() + 128;
 			sendPackage(command, 1, outputData);
 			break;
 
 		case GET_ANGLE:
-			outputData[0] = (byte)(sc->get_direction() + 128);
+			outputData[0] = (byte)(_sc->get_direction() + 128);
 			sendPackage(command, 1, outputData);
 			break;
 
 		case GET_SPEEDANGLE:
-			outputData[0] = mc->get_speed() + 128;
-			outputData[1] = (byte)(sc->get_direction() + 128);
+			outputData[0] = _mc->get_speed() + 128;
+			outputData[1] = (byte)(_sc->get_direction() + 128);
 			sendPackage(command, 2, outputData);
 			break;
 
 		case GET_ULTRAREADER:
-			distance = ur->get_distance();
+			distance = _ur->get_distance();
 			outputData[0] = (distance & 0x000000FF);
 			outputData[1] = (distance & 0x0000FF00) >> 8;
 			outputData[2] = (distance & 0x00FF0000) >> 16;
 			outputData[3] = (distance & 0xFF000000) >> 24;
-			outputData[4] = ur->has_lock() ? 0x01 : 0x00;
+			outputData[4] = _ur->has_lock() ? 0x01 : 0x00;
 			sendPackage(command, 5, outputData);
 			break;
 
 		case GET_STATUS:
-			distance = ur->get_distance();
-			outputData[0] = mc->get_speed() + 128;
-			outputData[1] = (byte)(sc->get_direction() + 128);
+			distance = _ur->get_distance();
+			outputData[0] = _mc->get_speed() + 128;
+			outputData[1] = (byte)(_sc->get_direction() + 128);
 			outputData[2] = (distance & 0x000000FF);
 			outputData[3] = (distance & 0x0000FF00) >> 8;
 			outputData[4] = (distance & 0x00FF0000) >> 16;
 			outputData[5] = (distance & 0xFF000000) >> 24;
-			outputData[6] = ur->has_lock() ? 0x01 : 0x00;
+			outputData[6] = _ur->has_lock() ? 0x01 : 0x00;
 			sendPackage(command, 7, outputData);
 			break;
 
@@ -126,7 +126,7 @@ void SerialCommunication::processPackage(byte * Package){
 					sendErrorPackage(ERROR_OUT_OF_BOUND);
 				}
 				else {
-					mc->set_speed(speed);
+					_mc->set_speed(speed);
 					sendPackage(ACK_OK);
 				}
 			}
@@ -142,7 +142,7 @@ void SerialCommunication::processPackage(byte * Package){
 					sendErrorPackage(ERROR_OUT_OF_BOUND);
 				}
 				else {
-					sc->set_goal(angle);
+					_sc->set_goal(angle);
 					sendPackage(ACK_OK);
 				}
 			}
@@ -159,8 +159,8 @@ void SerialCommunication::processPackage(byte * Package){
 					sendErrorPackage(ERROR_OUT_OF_BOUND);
 				}
 				else {
-					mc->set_speed(speed);
-					sc->set_goal(angle);
+					_mc->set_speed(speed);
+					_sc->set_goal(angle);
 					sendPackage(ACK_OK);
 				}
 			}

@@ -13,8 +13,8 @@ class ServoController {
         void stop();
 
     private:
-        int pwm_pin, enable_pin, in1_pin, in2_pin, analog_pin, goal, direction;
-        char duty;
+        int _pwm_pin, _enable_pin, _in1_pin, _in2_pin, _analog_pin, _goal, _direction;
+        char _duty;
         void enable_servo();
         void disable_servo();
         void servo_left();

@@ -3,30 +3,28 @@
 #include "Arduino.h"
 
 
-UltraSoundReader::UltraSoundReader(int trigger_pin, int echo_pin) {
+UltraSoundReader::UltraSoundReader(int trigger_pin, int echo_pin) : _trigger(trigger_pin), _echo(echo_pin){
 	pinMode(echo_pin, INPUT);
-    pinMode(trigger_pin, OUTPUT);
-	this->trigger = trigger_pin;
-	this->echo = echo_pin;
+  pinMode(trigger_pin, OUTPUT);
 }
 
 void UltraSoundReader::read_sensor() {
-	digitalWrite(this->trigger, HIGH);
-    delayMicroseconds(5);
-    digitalWrite(this->trigger, LOW);
-    this->distance = pulseIn(this->echo, HIGH, 50000);
+	digitalWrite(_trigger, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(_trigger, LOW);
+  _distance = pulseIn(_echo, HIGH, 50000);
 
-    if (this->distance <= 0) {
-    	lock = false;
+  if (_distance <= 0) {
+		_lock = false;
 	} else {
-		lock = true;
+		_lock = true;
 	}
 }
 
 long UltraSoundReader::get_distance() {
-	return (long)(this->distance) / 58.138;
+	return (long)(_distance) / 58.138;
 }
 
 bool UltraSoundReader::has_lock() {
-	return lock;
+	return _lock;
 }

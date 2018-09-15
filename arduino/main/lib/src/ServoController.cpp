@@ -10,104 +10,97 @@
 ServoController::ServoController(
     int pwm_pin, int enable_pin, int in1_pin, int in2_pin, char duty,
     int analog_pin
-) {
-    this->pwm_pin = pwm_pin;
-    this->enable_pin = enable_pin;
-    this->in1_pin = in1_pin;
-    this->in2_pin = in2_pin;
-    this->duty = duty; // TODO: Change this ??
-    this->analog_pin = analog_pin;
-    this->direction = 0;
-}
+) : _pwm_pin(pwm_pin), _enable_pin(enable_pin), _in1_pin(in1_pin),
+    _in2_pin(in2_pin), _duty(duty), _analog_pin(analog_pin), _direction(0) { }
 
 
 int ServoController::get_direction() {
-    return this->direction;
+    return _direction;
 }
 
 
 // LOW LEVEL NITTY/GRITTY STUFFS
 
 void ServoController::enable_servo() {
-    digitalWrite(this->enable_pin, HIGH);
+    digitalWrite(_enable_pin, HIGH);
 }
 
 void ServoController::disable_servo() {
-    digitalWrite(this->enable_pin, LOW);
+    digitalWrite(_enable_pin, LOW);
 }
 
 void ServoController::servo_left() {
-    this->enable_servo();
-    digitalWrite(this->in1_pin, HIGH);
-    digitalWrite(this->in2_pin, LOW);
-    analogWrite(this->pwm_pin, this->duty);
+    enable_servo();
+    digitalWrite(_in1_pin, HIGH);
+    digitalWrite(_in2_pin, LOW);
+    analogWrite(_pwm_pin, _duty);
 }
 
 void ServoController::servo_right() {
-    this->enable_servo();
-    digitalWrite(this->in1_pin, LOW);
-    digitalWrite(this->in2_pin, HIGH);
-    analogWrite(this->pwm_pin, this->duty);
+    enable_servo();
+    digitalWrite(_in1_pin, LOW);
+    digitalWrite(_in2_pin, HIGH);
+    analogWrite(_pwm_pin, _duty);
 }
 
 void ServoController::servo_stop() {
-    digitalWrite(this->in1_pin, LOW);
-    digitalWrite(this->in2_pin, LOW);
+    digitalWrite(_in1_pin, LOW);
+    digitalWrite(_in2_pin, LOW);
 }
 
 int ServoController::angle() {
-	return analogRead(this->analog_pin);
+	return analogRead(_analog_pin);
 }
 
 // PROPER CONTROL STUFFS
 
 void ServoController::turn_left() {
 	if(!overshoot_left()) {
-		this->servo_left();
+		servo_left();
 	}
 }
 
 void ServoController::turn_right() {
 	if(!overshoot_right()) {
-		this->servo_right();
+		servo_right();
     }
 }
 
 void ServoController::set_goal(int new_direction) {
-	this->goal = (MAX_RIGHT-MAX_LEFT) * (float)(new_direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
-    this->direction = new_direction;
+	_goal = (MAX_RIGHT-MAX_LEFT) * (float)(new_direction - 100) / (float)200  + MAX_RIGHT; // direction = [-100, 100]
+    _direction = new_direction;
 }
 
 void ServoController::reach_goal() {
-	int diff = this->goal_diff();
+	int diff = goal_diff();
 
 	if(diff < -TOLERANCE) {
-		this->turn_right();
+		turn_right();
 	}
 	else if(diff > TOLERANCE) {
-		this->turn_left();
+		turn_left();
 	}
 	else {
-		this->stop();
+		stop();
 	}
 }
 
 int ServoController::goal_diff() {
-	return this->goal - this->angle();
+	return _goal - angle();
 }
 
 void ServoController::stop() {
-	this->servo_stop();
+	servo_stop();
 }
 
 bool ServoController::overshoot_left() {
-  return this->angle() > MAX_LEFT;
+  return angle() > MAX_LEFT;
 }
 
 bool ServoController::overshoot_right() {
-  return this->angle() < MAX_RIGHT;
+  return angle() < MAX_RIGHT;
 }
 
 bool ServoController::overshoot() {
-	return this->overshoot_left() || this->overshoot_right();
+	return overshoot_left() || overshoot_right();
 }
