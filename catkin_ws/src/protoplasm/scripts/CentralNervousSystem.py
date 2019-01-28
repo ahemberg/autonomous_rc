@@ -88,7 +88,8 @@ class Brain:
         sleep(SERIAL_DELAY_TIME)
         resp_pkg = self.spine.read_impulse()
         if len(resp_pkg) > 1:
-            ultrasound_reader['distance'] = int.from_bytes(resp_pkg[3:6], byteorder='little')
+            # ultrasound_reader['distance'] = int.from_bytes(resp_pkg[3:6], byteorder='little')
+            ultrasound_reader['distance'] = int(resp_pkg[3:6].encode('hex'), 16)
             ultrasound_reader['lock'] = resp_pkg[7]
 
         return ultrasound_reader
@@ -102,7 +103,8 @@ class Brain:
         if len(resp_pkg) > 1:
             status['speed'] = resp_pkg[3] - 128
             status['direction'] = resp_pkg[4] - 128
-            status['distance'] = int.from_bytes(resp_pkg[5:8], byteorder='little')
+            # status['distance'] = int.from_bytes(resp_pkg[5:8], byteorder='little')
+            status['distance'] = int(resp_pkg[5:8].encode('hex'), 16)
             status['lock'] = resp_pkg[9]
 
         return status
