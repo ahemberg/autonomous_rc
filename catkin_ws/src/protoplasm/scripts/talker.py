@@ -39,20 +39,21 @@
 import rospy
 from CentralNervousSystem import Brain
 from std_msgs.msg import String
+import getch
+from time import sleep
 
 
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10)  # 10hz
 
-    brain = Brain()
 
     while not rospy.is_shutdown():
-        speed = str(brain.get_speed())
-        rospy.loginfo(speed)
-        pub.publish(speed)
-        rate.sleep()
+        char = getch.getch()
+        if char:
+            rospy.loginfo(char)
+            pub.publish(char)
+        sleep(1)
 
 
 if __name__ == '__main__':
