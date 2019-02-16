@@ -53,7 +53,7 @@ def talker():
         if char:
             rospy.loginfo(char)
             pub.publish(char)
-        sleep(1)
+        sleep(0.1)
 
 
 if __name__ == '__main__':

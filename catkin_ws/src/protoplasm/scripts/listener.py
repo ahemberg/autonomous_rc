@@ -11,17 +11,23 @@ def callback(data):
     rospy.loginfo(rospy.get_caller_id() + 'Message: %s', data.data)
     #brain.set_direction(data.data)
     
+
     if data.data == 'w':
-        brain.set_speed_dir(100, 0)        
+        brain.set_speed(50)        
     elif data.data == 's':
-        brain.set_speed_dir(-100, 0)        
+        brain.set_speed(-50)
+    elif data.data == 'q':
+        brain.set_speed(0)       
     elif data.data == 'a':
         brain.set_direction(-100)        
     elif data.data == 'd':
-        brain.set_direction(100)        
+        brain.set_direction(100)
+    elif data.data == 'e':
+        brain.set_direction(0)   
     else:
         brain.set_speed_dir(0, 0)        
 
+    #brain.set_speed_dir(speed, direction)
 
 def listener():
 
