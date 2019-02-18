@@ -1,4 +1,12 @@
 ### ROS ###
 /catkin_ws/devel/
 /catkin_ws/build/
+/catkin_ws/install/
+.catkin_workspace
 /venv/
+
+### Python general ###
+__pycache__
+*pyc
+
+.vscode/
