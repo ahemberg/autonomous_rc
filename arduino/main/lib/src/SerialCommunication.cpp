@@ -63,7 +63,7 @@ void SerialCommunication::sendErrorPackage(byte errorCode) {
   sendPackage(ACK_ERROR, 1, errorMsg);
 }
 
-void SerialCommunication::processPackage(byte *Package) {
+void SerialCommunication::parsePackage(byte *Package) {
   byte command = Package[1];
   byte dataSize = Package[2];
   byte inputData[dataSize];
@@ -191,6 +191,17 @@ byte SerialCommunication::validatePackage(byte *Package, int packageByteSize) {
     } else {
       errorCode = 0;
     }
+  }
+
+  return errorCode;
+}
+
+byte SerialCommunication::processPackage(byte *receivedPackage, int bytesRead) {
+  byte errorCode;
+
+  errorCode = validatePackage(receivedPackage, bytesRead);
+  if (errorCode == 0) {
+    parsePackage(receivedPackage);
   }
 
   return errorCode;

@@ -13,7 +13,8 @@ public:
       : _mc(mCtrl), _sc(sCtrl), _ur(usReader) {}
   int readBuffer(byte *buffer, int bufferSize);
   byte validatePackage(byte *Package, int packageByteSize);
-  void processPackage(byte *Package);
+  void parsePackage(byte *Package);
+  byte processPackage(byte *Package, int bytesRead);
   void sendPackage(byte command, byte dataSize, byte *packageData);
   void sendErrorPackage(byte errorCode);
 

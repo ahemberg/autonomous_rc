@@ -13,3 +13,6 @@
 #define INPUT1_MOTOR 5
 #define INPUT2_MOTOR 6
 #define ENABLE_MOTOR 4
+
+// Defines pin to check communication with RP0
+#define CHECK_COMM 13

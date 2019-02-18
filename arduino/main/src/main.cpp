@@ -26,7 +26,13 @@ void setup() {
 void loop() {
   us_reader.read_sensor();
 
+  // set speed to 0 if too close to object
   if (us_reader.get_distance() < 50 && us_reader.has_lock()) {
+    mc.set_speed(0);
+  }
+
+  // set speed to 0 if no communication with RP0
+  if (digitalRead(CHECK_COMM) != HIGH) {
     mc.set_speed(0);
   }
 
@@ -42,8 +48,6 @@ void serialEvent() {
     memcpy(receivedPackage, buffer,
            bytesRead); // copy data from buffer to package
 
-    if (scom.validatePackage(receivedPackage, bytesRead) == 0) {
-      scom.processPackage(receivedPackage);
-    }
+    scom.processPackage(receivedPackage, bytesRead);
   }
 }
